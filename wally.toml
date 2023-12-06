@@ -1,0 +1,9 @@
+[package]
+name = "ffrostflame/bytenet"
+version = "0.1.0"
+registry = "https://github.com/UpliftGames/wally-index"
+realm = "shared"
+
+[dependencies]
+LuauSignal = "ffrostflame/luausignal@0.1.3"
+wallyInstanceManager = "ffrostflame/wally-instance-manager@0.1.0"
