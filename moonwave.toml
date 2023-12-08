@@ -1,44 +1,27 @@
 title = "ByteNet"
-gitRepoUrl = "https://github.com/ffrostflame/bridgenet2/"
+gitRepoUrl = "https://github.com/ffrostflame/bytenet/"
 
 changelog = true
 
 [docusaurus]
 projectName = "ByteNet"
 tagline = "description"
-favicon = "favicon.png"
-
-[navbar.logo]
-alt = "ByteNet"
-src = "logo.png"
 
 [footer]
 style = "dark"
 
 [home]
-enabled = true
+enabled = false
 includeReadme = false
 
 [[home.features]]
 title = "Cuts out Roblox overhead"
-description = ""
-
-[[home.features]]
-title = "Low-level"
-description = ""
-
-[[home.features]]
-title = "Enables you to maximize performance"
-description = ""
+description = "You decide what you're sending. Supports uint8, int16, etc."
 
 [[home.features]]
 title = "Strictly typed"
-description = ""
-
-[[home.features]]
-title = "Typed API"
-description = ""
+description = "Written purely in Luau, for Luau"
 
 [[home.features]]
 title = "Simple"
-description = ""
+description = "Easy to learn quickly"

@@ -5,7 +5,7 @@ type Packet<T> = {
 }
 
 export type ByteNet = {
-	createPacket: <_, T>(reliabilityType: "reliable" | "unreliable", structure: T) -> Packet<T>,
+	definePacket: <_, T>(reliabilityType: "reliable" | "unreliable", structure: T) -> Packet<T>,
 
 	dataTypes: {
 		uint8: number,

@@ -1,10 +1,12 @@
 local RunService = game:GetService("RunService")
 
+local packetReporter = require(script.Parent.Parent.logging.packetReporter)
 local clientPacketIDs = require(script.Parent.Parent.packets.identifiers.clientPacketIDs)
 local serverPacketIDs = require(script.Parent.Parent.packets.identifiers.serverPacketIDs)
 local clientProcess = require(script.Parent.Parent.process.client.clientProcess)
 local send = require(script.Parent.Parent.process.parsing.send)
 local serverProcess = require(script.Parent.Parent.process.server.serverProcess)
+local dataTypeList = require(script.Parent.Parent.storage.dataTypeList)
 local reliabilityTypeList = require(script.Parent.Parent.storage.reliabilityTypeList)
 local getUnique = require(script.Parent.getUnique)
 
@@ -17,6 +19,7 @@ export type packetType = typeof(setmetatable(
 		_reliabilityType: reliabilityTypeList.reliabilityType,
 
 		_listeners: { [number]: (data: {}, player: Player) -> () },
+		_reporter: packetReporter.packetReporterType,
 	},
 	packetMetatable
 ))
@@ -28,6 +31,30 @@ function packetPrototype.sendToAll(self: packetType, data)
 end
 
 function packetPrototype.send(self: packetType, data: { [string]: any }, target: Player?)
+	for _, v in self._order do
+		local key = v[1]
+		local dataType = v[2]
+
+		local value = data[key]
+		if value == nil then
+			self._reporter:error("missing key " .. key)
+			return
+		else
+			local dataTypeInfo = dataTypeList[dataType]
+			if not dataTypeInfo.typecheck(value) then
+				self._reporter:raiseTypeError(key, dataType, typeof(value))
+				return
+			end
+
+			if dataTypeInfo.checkBounds then
+				if not dataTypeInfo.checkBounds(value) then
+					self._reporter:raiseBoundsError(key, dataTypeInfo.min, dataTypeInfo.max, value)
+					return
+				end
+			end
+		end
+	end
+
 	local packetBuffer = send(self._id, data, self._order)
 
 	if RunService:IsServer() then
@@ -66,6 +93,8 @@ return function(reliabilityType: reliabilityTypeList.reliabilityType, packetStru
 			value,
 		})
 	end
+
+	self._reporter = packetReporter(self._id)
 
 	table.sort(self._order, function(a, b)
 		return a[1] < b[1]
