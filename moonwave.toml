@@ -1,0 +1,44 @@
+title = "ByteNet"
+gitRepoUrl = "https://github.com/ffrostflame/bridgenet2/"
+
+changelog = true
+
+[docusaurus]
+projectName = "ByteNet"
+tagline = "description"
+favicon = "favicon.png"
+
+[navbar.logo]
+alt = "ByteNet"
+src = "logo.png"
+
+[footer]
+style = "dark"
+
+[home]
+enabled = true
+includeReadme = false
+
+[[home.features]]
+title = "Cuts out Roblox overhead"
+description = ""
+
+[[home.features]]
+title = "Low-level"
+description = ""
+
+[[home.features]]
+title = "Enables you to maximize performance"
+description = ""
+
+[[home.features]]
+title = "Strictly typed"
+description = ""
+
+[[home.features]]
+title = "Typed API"
+description = ""
+
+[[home.features]]
+title = "Simple"
+description = ""

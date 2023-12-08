@@ -12,19 +12,19 @@
 				}
 			},
 			"shared": {
-				"$path": "tests/shared"
+				"$path": "dev/shared"
 			}
 		},
 		
 		"ServerScriptService": {
 			"server": {
-				"$path": "tests/server"
+				"$path": "dev/server"
 			}
 		},
 		
 		"StarterPlayer": {
 			"StarterPlayerScripts": {
-				"$path": "tests/client"
+				"$path": "dev/client"
 			}
 		}
 	}

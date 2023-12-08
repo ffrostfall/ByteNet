@@ -1,13 +1,28 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
-local dataTypeList = require(ReplicatedStorage.Packages.ByteNet.storage.dataTypes.dataTypeList)
+local dataTypeList = require(ReplicatedStorage.Packages.ByteNet.storage.dataTypeList)
 local retrievePacketFromID = require(script.Parent.Parent.retrievePacketFromID)
 
-return function(receivedBuffer: buffer)
+local freeThread: thread? -- Thread reusage
+
+local function passer(callback, data, player): ()
+	local acquiredThread = freeThread
+	freeThread = nil
+	callback(data, player)
+	freeThread = acquiredThread
+end
+
+local function yielder(): ()
+	while true do
+		passer(coroutine.yield())
+	end
+end
+
+return function(receivedBuffer: buffer, player: Player?)
 	local bufferLength = buffer.len(receivedBuffer)
 
 	local cursor = 0
-	while cursor <= bufferLength do
+	while cursor < bufferLength do
 		local packetID = buffer.readu8(receivedBuffer, cursor)
 		cursor += 1
 
@@ -19,16 +34,20 @@ return function(receivedBuffer: buffer)
 			local dataType = keyDataTypePair[2]
 
 			local dataTypeInfo = dataTypeList[dataType]
-			local size = dataTypeInfo.size
 
 			local length: number?
 			packetStructure[key], length = dataTypeInfo.read(receivedBuffer, cursor)
 
-			if length then
-				size = length
+			cursor += dataTypeInfo.size or length or 0
+		end
+
+		for _, callback in packet._listeners do
+			if freeThread == nil then
+				freeThread = coroutine.create(yielder)
+				task.spawn(freeThread :: thread)
 			end
 
-			cursor += size
+			task.spawn(freeThread :: thread, callback, packetStructure, player)
 		end
 	end
 end

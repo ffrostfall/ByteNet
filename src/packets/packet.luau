@@ -3,8 +3,9 @@ local RunService = game:GetService("RunService")
 local clientPacketIDs = require(script.Parent.Parent.packets.identifiers.clientPacketIDs)
 local serverPacketIDs = require(script.Parent.Parent.packets.identifiers.serverPacketIDs)
 local clientProcess = require(script.Parent.Parent.process.client.clientProcess)
+local send = require(script.Parent.Parent.process.parsing.send)
 local serverProcess = require(script.Parent.Parent.process.server.serverProcess)
-local reliabilityTypeList = require(script.Parent.Parent.storage.reliabilityTypes.reliabilityTypeList)
+local reliabilityTypeList = require(script.Parent.Parent.storage.reliabilityTypeList)
 local getUnique = require(script.Parent.getUnique)
 
 local packetPrototype = {}
@@ -12,22 +13,22 @@ local packetMetatable = { __index = packetPrototype }
 export type packetType = typeof(setmetatable(
 	{} :: {
 		_id: number,
-		--_unique: string,
+		_order: { [number]: { string } },
 		_reliabilityType: reliabilityTypeList.reliabilityType,
 
-		--_size: number,
+		_listeners: { [number]: (data: {}, player: Player) -> () },
 	},
 	packetMetatable
 ))
 
-function packetPrototype.sendToAll(self: packetType, _)
-	local packetBuffer = buffer.create(1) -- convertToBytes(self._sortedStructure, data, self._id, self._size)
+function packetPrototype.sendToAll(self: packetType, data)
+	local packetBuffer = send(self._id, data, self._order)
 
 	serverProcess.sendEveryone(self._reliabilityType, packetBuffer)
 end
 
-function packetPrototype.send(self: packetType, _, target: Player?)
-	local packetBuffer = buffer.create(1) -- convertToBytes(self._sortedStructure, data, self._id, self._size)
+function packetPrototype.send(self: packetType, data: { [string]: any }, target: Player?)
+	local packetBuffer = send(self._id, data, self._order)
 
 	if RunService:IsServer() then
 		if target then
@@ -41,11 +42,7 @@ function packetPrototype.send(self: packetType, _, target: Player?)
 end
 
 function packetPrototype.listen(self: packetType, callback: (data: {}, player: Player?) -> ())
-	if RunService:IsServer() then
-		serverProcess.listen(self._id, callback)
-	else
-		clientProcess.listen(self._id, callback)
-	end
+	table.insert(self._listeners, callback)
 end
 
 return function(reliabilityType: reliabilityTypeList.reliabilityType, packetStructure: { [string]: any }): packetType
@@ -64,10 +61,6 @@ return function(reliabilityType: reliabilityTypeList.reliabilityType, packetStru
 	-- structure stuff
 	self._order = {}
 	for key, value in packetStructure do
-		local num = 0
-		for i = 1, string.len(key) do
-			num += string.byte(key, i, i)
-		end
 		table.insert(self._order, {
 			key,
 			value,
@@ -77,6 +70,8 @@ return function(reliabilityType: reliabilityTypeList.reliabilityType, packetStru
 	table.sort(self._order, function(a, b)
 		return a[1] < b[1]
 	end)
+
+	self._listeners = {}
 
 	return self
 end
