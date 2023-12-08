@@ -10,5 +10,5 @@ If you're using Wally, you can simply drop this snippet in, except replace `late
 
 ```toml title="wally.toml"
 [dependencies]
-ByteNet = "ffrostflame/bytenet2@latest"
+ByteNet = "ffrostflame/bytenet@latest"
 ```
