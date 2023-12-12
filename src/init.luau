@@ -82,7 +82,7 @@ end
 	@method listen
 	@within Packet
 	
-	@param callback (data: {[string]: any}, player: Player) -> ()
+	@param callback (data: {[string]: any}, player: Player?) -> ()
 	
 	When the packet is received, the callback is called with the data, and if on the server, the player who sent the packet.
 ]=]

@@ -138,7 +138,7 @@ return {
 		end,
 	},
 
-	f64 = {
+	ffloat64 = {
 		size = 8,
 
 		min = -1.7976931348623157e+308,
@@ -157,7 +157,7 @@ return {
 		end,
 	},
 
-	f32 = {
+	float32 = {
 		size = 4,
 
 		min = -3.4028234663852886e+38,
@@ -176,7 +176,7 @@ return {
 		end,
 	},
 
-	v3 = {
+	vec3 = {
 		size = 12,
 
 		typecheck = function(value)
