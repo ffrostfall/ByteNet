@@ -19,7 +19,12 @@ local globalChannels = {
 	[reliabilityTypeList.unreliable] = channel(),
 }
 
-local function onServerEvent(player, data)
+local function onServerEvent(player: Player, data)
+	if buffer.len(data) >= 100000 then
+		warn("over 100K byte limit from player: " .. player.UserId)
+		return
+	end
+
 	receive(data, player)
 end
 

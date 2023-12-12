@@ -5,10 +5,8 @@ local serverPacketIDs = require(script.Parent.Parent.packets.identifiers.serverP
 
 local isServer = RunService:IsServer()
 
-return function(packetID: number)
-	if isServer then
-		return serverPacketIDs.getPacketFromID(packetID)
-	else
-		return clientPacketIDs.getPacketFromID(packetID)
-	end
+if isServer then
+	return serverPacketIDs.getPacketFromID
+else
+	return clientPacketIDs.getPacketFromID
 end

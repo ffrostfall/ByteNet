@@ -1,0 +1,16 @@
+{
+	"compilerOptions": {
+		"target": "es5",
+		"module": "commonjs",
+		"outDir": "dist",
+		"strict": true,
+		"esModuleInterop": true,
+		"forceConsistentCasingInFileNames": true,
+		"noLib": true,
+		"moduleDetection": "force",
+		"moduleResolution": "node",
+		"allowSyntheticDefaultImports": true,
+		"typeRoots": ["node_modules/@rbxts"],
+		"rootDir": "src",
+	}
+}

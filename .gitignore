@@ -8,3 +8,4 @@ Packages
 /*.rbxl.lock
 
 build
+node_modules

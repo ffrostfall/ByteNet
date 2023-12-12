@@ -85,6 +85,8 @@ return function(reliabilityType: reliabilityTypeList.reliabilityType, packetStru
 		self._id = clientPacketIDs.assignPacket(self._unique, self)
 	end
 
+	self._reporter = packetReporter(self._id)
+
 	-- structure stuff
 	self._order = {}
 	for key, value in packetStructure do
@@ -93,8 +95,6 @@ return function(reliabilityType: reliabilityTypeList.reliabilityType, packetStru
 			value,
 		})
 	end
-
-	self._reporter = packetReporter(self._id)
 
 	table.sort(self._order, function(a, b)
 		return a[1] < b[1]

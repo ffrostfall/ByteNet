@@ -1,0 +1,15 @@
+{
+  "name": "@rbxts/bytenet",
+  "version": "0.1.0",
+  "description": "---",
+  "main": "index.d.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "ffrostfall",
+  "license": "MIT",
+  "module": "commonjs",
+  "devDependencies": {
+    "@rbxts/types": "^1.0.737"
+  }
+}
