@@ -1,4 +1,4 @@
-# ByteNet v0.1.0
+# ByteNet
 
 ## An advanced, modern networking library for Roblox
 
