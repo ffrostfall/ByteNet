@@ -9,7 +9,20 @@ export type ByteNet = {
 
 	dataTypes: {
 		uint8: number,
+		int8: number,
+
+		uint16: number,
+		int16: number,
+
+		uint32: number,
+		int32: number,
+
+		float32: number,
+		float64: number,
+
+		vec3: Vector3,
 		string: string,
+		bool: boolean,
 	},
 }
 
