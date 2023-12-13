@@ -1,11 +1,27 @@
 declare class Packet<T> {
-	listen(callback: (data: T, target: Player | undefined) => void): void;
+	/**
+	 * @server
+	 */
+	listen(callback: (data: T, target: Player) => void): void;
+	
+	/**
+	 * @client
+	 */
+	listen(callback: (data: T) => void): void;
 	
 	/**
 	 * @server
 	 */
 	sendToAll(data: T): void;
 	
+	/**
+	 * @client
+	 */
+	send(data: T): void;
+	
+	/**
+	 * @server
+	 */
 	send(data: T, target: Player): void;
 }
 

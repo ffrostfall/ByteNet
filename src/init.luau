@@ -94,6 +94,17 @@ return (
 		dataTypes = {
 			string = "string",
 			uint8 = "uint8",
+			uint16 = "uint16",
+			uint32 = "uint32",
+
+			int8 = "int8",
+			int16 = "int16",
+			int32 = "int32",
+
+			float32 = "float32",
+			float64 = "float64",
+			vec3 = "vec3",
+			bool = "bool",
 		},
 	}) :: any
 ) :: types.ByteNet

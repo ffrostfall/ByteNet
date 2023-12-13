@@ -1,10 +1,9 @@
 local Players = game:GetService("Players")
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 
-local mergeBufferArray = require(ReplicatedStorage.Packages.ByteNet.process.mergeBufferArray)
+local mergeBufferArray = require(script.Parent.Parent.Parent.process.mergeBufferArray)
 local byteNetInstance = require(script.Parent.Parent.byteNetInstance)
-local wallyInstanceManager = require(ReplicatedStorage.Packages.wallyInstanceManager)
+local wallyInstanceManager = require(script.Parent.Parent.Parent.Parent.wallyInstanceManager)
 local reliabilityTypeList = require(script.Parent.Parent.Parent.storage.reliabilityTypeList)
 local channel = require(script.Parent.Parent.channel)
 local receive = require(script.Parent.Parent.parsing.receive)

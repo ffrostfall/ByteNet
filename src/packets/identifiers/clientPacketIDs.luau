@@ -1,6 +1,4 @@
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-
-local wallyInstanceManager = require(ReplicatedStorage.Packages.wallyInstanceManager)
+local wallyInstanceManager = require(script.Parent.Parent.Parent.Parent.wallyInstanceManager)
 
 local packetStorage = nil
 local packetMap = {}

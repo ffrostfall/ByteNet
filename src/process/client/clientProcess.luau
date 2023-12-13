@@ -1,11 +1,10 @@
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 
 local byteNetInstance = require(script.Parent.Parent.Parent.process.byteNetInstance)
 local channel = require(script.Parent.Parent.Parent.process.channel)
 local reliabilityTypeList = require(script.Parent.Parent.Parent.storage.reliabilityTypeList)
 local receive = require(script.Parent.Parent.parsing.receive)
-local wallyInstanceManager = require(ReplicatedStorage.Packages.wallyInstanceManager)
+local wallyInstanceManager = require(script.Parent.Parent.Parent.Parent.wallyInstanceManager)
 
 local reliableChannel = channel()
 local unreliableChannel = channel()

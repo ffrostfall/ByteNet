@@ -138,7 +138,7 @@ return {
 		end,
 	},
 
-	ffloat64 = {
+	float64 = {
 		size = 8,
 
 		min = -1.7976931348623157e+308,

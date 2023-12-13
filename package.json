@@ -2,10 +2,7 @@
   "name": "@rbxts/bytenet",
   "version": "0.1.1",
   "description": "---",
-  "main": "index.d.ts",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
+  "main": "src/index.d.ts",
   "author": "ffrostfall",
   "license": "MIT",
   "module": "commonjs",

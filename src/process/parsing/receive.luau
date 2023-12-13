@@ -1,6 +1,4 @@
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-
-local dataTypeList = require(ReplicatedStorage.Packages.ByteNet.storage.dataTypeList)
+local dataTypeList = require(script.Parent.Parent.Parent.storage.dataTypeList)
 local retrievePacketFromID = require(script.Parent.Parent.retrievePacketFromID)
 
 local freeThread: thread? -- Thread reusage
