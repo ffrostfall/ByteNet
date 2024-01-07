@@ -62,7 +62,7 @@ function serverProcess.start()
 			local reliableQueue = channels[reliabilityTypeList.reliable]:flush()
 			local unreliableQueue = channels[reliabilityTypeList.unreliable]:flush()
 
-			if reliableQueue then
+			if reliableQueue or globalReliableQueue then
 				if globalReliableQueue then
 					reliableQueue = mergeBufferArray({ reliableQueue, globalReliableQueue })
 				end
@@ -70,7 +70,7 @@ function serverProcess.start()
 				remoteInstances.reliable:FireClient(player, reliableQueue)
 			end
 
-			if unreliableQueue then
+			if unreliableQueue or globalUnreliableQueue then
 				if globalUnreliableQueue then
 					unreliableQueue = mergeBufferArray({ unreliableQueue, globalUnreliableQueue })
 				end
