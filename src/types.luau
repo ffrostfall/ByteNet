@@ -5,7 +5,7 @@ type Packet<T> = {
 }
 
 export type ByteNet = {
-	definePacket: <_, T>(reliabilityType: "reliable" | "unreliable", structure: T) -> Packet<T>,
+	definePacket: <T>(structure: T, reliabilityType: ("reliable" | "unreliable")?) -> Packet<T>,
 
 	dataTypes: {
 		uint8: number,
@@ -23,6 +23,7 @@ export type ByteNet = {
 		vec3: Vector3,
 		string: string,
 		bool: boolean,
+		buff: buffer,
 	},
 }
 

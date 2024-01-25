@@ -105,6 +105,7 @@ return (
 			float64 = "float64",
 			vec3 = "vec3",
 			bool = "bool",
+			buff = "buff",
 		},
 	}) :: any
 ) :: types.ByteNet

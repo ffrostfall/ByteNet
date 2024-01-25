@@ -232,6 +232,27 @@ return {
 			return buffer.readstring(targetBuffer, offset + 1, length), length + 1
 		end,
 	},
+
+	buff = {
+		size = nil,
+
+		typecheck = function(value)
+			return typeof(value) == "buffer"
+		end,
+
+		write = function(targetBuffer, offset, userBuffer)
+			local length = buffer.len(userBuffer)
+			buffer.writeu16(targetBuffer, offset, length)
+			buffer.fill(targetBuffer, offset + 2, userBuffer)
+			return length + 2
+		end,
+
+		read = function(targetBuffer, offset)
+			local length = buffer.readu16(targetBuffer, offset)
+			local newBuffer = buffer.create(length)
+			return buffer.copy(newBuffer, 0, targetBuffer, offset + 2), length + 2
+		end,
+	},
 } :: {
 	[string]: {
 		size: number?,

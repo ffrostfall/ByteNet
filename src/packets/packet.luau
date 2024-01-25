@@ -1,5 +1,7 @@
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 
+local currentRunContext = require(ReplicatedStorage.Packages.ByteNet.storage.currentRunContext)
 local packetReporter = require(script.Parent.Parent.logging.packetReporter)
 local clientPacketIDs = require(script.Parent.Parent.packets.identifiers.clientPacketIDs)
 local serverPacketIDs = require(script.Parent.Parent.packets.identifiers.serverPacketIDs)
@@ -72,16 +74,16 @@ function packetPrototype.listen(self: packetType, callback: (data: {}, player: P
 	table.insert(self._listeners, callback)
 end
 
-return function(reliabilityType: reliabilityTypeList.reliabilityType, packetStructure: { [string]: any }): packetType
+return function(packetStructure: { [string]: any }, reliabilityType: reliabilityTypeList.reliabilityType): packetType
 	local self = setmetatable({}, packetMetatable)
 
-	self._reliabilityType = reliabilityType
+	self._reliabilityType = reliabilityType or "reliable"
 
 	self._id = 0
 	self._unique = getUnique(packetStructure)
-	if RunService:IsServer() then
+	if currentRunContext == "server" then
 		self._id = serverPacketIDs.assignPacket(self._unique, self)
-	elseif RunService:IsClient() then
+	else
 		self._id = clientPacketIDs.assignPacket(self._unique, self)
 	end
 
