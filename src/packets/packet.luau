@@ -1,7 +1,6 @@
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 
-local currentRunContext = require(ReplicatedStorage.Packages.ByteNet.storage.currentRunContext)
+local currentRunContext = require(script.Parent.Parent.storage.currentRunContext)
 local packetReporter = require(script.Parent.Parent.logging.packetReporter)
 local clientPacketIDs = require(script.Parent.Parent.packets.identifiers.clientPacketIDs)
 local serverPacketIDs = require(script.Parent.Parent.packets.identifiers.serverPacketIDs)
