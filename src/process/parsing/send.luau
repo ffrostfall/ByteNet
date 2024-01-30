@@ -8,7 +8,7 @@ return function(packetID: number, data: {}, structure: { [number]: { string } })
 			size += length + 1
 		elseif keyDataPair[2] == "buff" then
 			local length = buffer.len(data[keyDataPair[1]])
-			size += length + 2
+			size += length + 4
 		else
 			local dataType = dataTypeList[keyDataPair[2]]
 

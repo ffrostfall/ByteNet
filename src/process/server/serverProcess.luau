@@ -27,6 +27,13 @@ local function onServerEvent(player: Player, data)
 	receive(data, player)
 end
 
+local function onPlayerAdded(player: Player)
+	playerChannels[player] = {
+		[reliabilityTypeList.reliable] = channel(),
+		[reliabilityTypeList.unreliable] = channel(),
+	}
+end
+
 local serverProcess = {}
 
 function serverProcess.start()
@@ -36,12 +43,11 @@ function serverProcess.start()
 	wallyInstanceManager.add(byteNetInstance, remoteInstances.reliable)
 	wallyInstanceManager.add(byteNetInstance, remoteInstances.unreliable)
 
-	Players.PlayerAdded:Connect(function(player: Player)
-		playerChannels[player] = {
-			[reliabilityTypeList.reliable] = channel(),
-			[reliabilityTypeList.unreliable] = channel(),
-		}
-	end)
+	for _, player in Players:GetPlayers() do
+		onPlayerAdded(player)
+	end
+
+	Players.PlayerAdded:Connect(onPlayerAdded)
 
 	Players.PlayerRemoving:Connect(function(player: Player)
 		playerChannels[player] = nil

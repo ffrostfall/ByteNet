@@ -240,17 +240,15 @@ return {
 			return typeof(value) == "buffer"
 		end,
 
-		write = function(targetBuffer, offset, userBuffer)
-			local length = buffer.len(userBuffer)
-			buffer.writeu16(targetBuffer, offset, length)
-			buffer.copy(targetBuffer, offset + 2, userBuffer)
-			return length + 2
+		write = function(targetBuffer, offset, targetString)
+			local length = #buffer.tostring(targetString)
+			buffer.writeu32(targetBuffer, offset, length)
+			buffer.writestring(targetBuffer, offset + 4, buffer.tostring(targetString))
+			return length + 4
 		end,
-
-		read = function(targetBuffer, offset)
-			local length = buffer.readu16(targetBuffer, offset)
-			local newBuffer = buffer.create(length)
-			return buffer.copy(newBuffer, 0, targetBuffer, offset + 2, length), length + 2
+		read = function(targetBuffer: buffer, offset)
+			local length = buffer.readu32(targetBuffer, offset)
+			return buffer.fromstring(buffer.readstring(targetBuffer, offset + 4, length)), length + 4
 		end,
 	},
 } :: {
