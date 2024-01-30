@@ -28,6 +28,10 @@ local function onServerEvent(player: Player, data)
 end
 
 local function onPlayerAdded(player: Player)
+	if playerChannels[player] then
+		return
+	end
+
 	playerChannels[player] = {
 		[reliabilityTypeList.reliable] = channel(),
 		[reliabilityTypeList.unreliable] = channel(),
@@ -92,6 +96,12 @@ function serverProcess.sendTo(
 	reliabilityType: reliabilityTypeList.reliabilityType,
 	packetBuffer: buffer
 )
+	if not playerChannels[player] then
+		playerChannels[player] = {
+			[reliabilityTypeList.reliable] = channel(),
+			[reliabilityTypeList.unreliable] = channel(),
+		}
+	end
 	playerChannels[player][reliabilityType]:add(packetBuffer)
 end
 
