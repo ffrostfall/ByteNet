@@ -25,4 +25,4 @@ ByteNet is incredibly performant, running **purely** on buffers with zero table 
 ByteNet lets **you** specify exact data types, such as **int8**, **uint32**. Packet IDs are **1 byte**.
 
 ---
-Further documentation here.
+Further documentation [here](https://ffrostflame.github.io/ByteNet/docs/intro).
