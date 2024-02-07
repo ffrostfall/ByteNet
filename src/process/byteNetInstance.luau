@@ -1,1 +1,0 @@
-return script.Parent.Parent

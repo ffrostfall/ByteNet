@@ -1,3 +1,4 @@
 {
-	"luau-lsp.sourcemap.rojoProjectFile": "dev.project.json"
+	"luau-lsp.sourcemap.rojoProjectFile": "dev.project.json",
+	"luau-lsp.completion.imports.requireStyle": "alwaysRelative"
 }

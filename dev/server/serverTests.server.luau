@@ -5,7 +5,7 @@ local testPackets = require(ReplicatedStorage.shared.testPackets)
 
 Players.PlayerAdded:Connect(function(player)
 	task.wait(1)
-	testPackets.a:send({ first = "testB", second = math.random(1, 8) }, player)
+	testPackets.a:send({ second = 5 }, player)
 end)
 
 testPackets.a:listen(function(data)

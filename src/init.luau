@@ -2,8 +2,9 @@ local RunService = game:GetService("RunService")
 
 local clientPacketIDs = require(script.packets.identifiers.clientPacketIDs)
 local serverPacketIDs = require(script.packets.identifiers.serverPacketIDs)
-local clientProcess = require(script.process.client.clientProcess)
-local serverProcess = require(script.process.server.serverProcess)
+local clientProcess = require(script.process.client)
+local dataTypes = require(script.process.dataTypes)
+local serverProcess = require(script.process.server)
 local types = require(script.types)
 
 if RunService:IsServer() then
@@ -87,25 +88,22 @@ end
 	When the packet is received, the callback is called with the data, and if on the server, the player who sent the packet.
 ]=]
 
+local dataTypeTable = setmetatable({}, {
+	__index = function(_, index)
+		return function()
+			if not dataTypes.writers[index] then
+				error("Invalid data type: " .. index)
+			end
+
+			return index
+		end
+	end,
+})
+
 return (
 	table.freeze({
 		definePacket = require(script.packets.packet),
 
-		dataTypes = {
-			string = "string",
-			uint8 = "uint8",
-			uint16 = "uint16",
-			uint32 = "uint32",
-
-			int8 = "int8",
-			int16 = "int16",
-			int32 = "int32",
-
-			float32 = "float32",
-			float64 = "float64",
-			vec3 = "vec3",
-			bool = "bool",
-			buff = "buff",
-		},
+		dataTypes = dataTypeTable,
 	}) :: any
 ) :: types.ByteNet

@@ -7,11 +7,7 @@ local dataTypeWriters = {
 	u8 = buffer.writeu8,
 }
 local dataTypeReaders = {
-	u8 = function(b: buffer)
-		local value = buffer.readu8(b, readCursor)
-		readCursor += 1
-		return value
-	end,
+	u8 = buffer.readu8,
 }
 local dataTypeLengths = {
 	u8 = function()
@@ -21,8 +17,6 @@ local dataTypeLengths = {
 
 local dataTypes = {
 	u8 = "u8",
-	dynString = "dynString",
-	dynArray = "dynArray",
 }
 
 local function createPacketStructure(structure: { [string]: string })
@@ -108,7 +102,8 @@ local function read(incomingBuffer: buffer)
 		local structure = allPackets[id]
 		local deserialized = {}
 		for _, item in structure do
-			local value = item.reader(incomingBuffer)
+			local value = item.reader(incomingBuffer, readCursor)
+			readCursor += item.length()
 
 			deserialized[item.key] = value
 		end

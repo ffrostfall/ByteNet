@@ -10,6 +10,5 @@ end)
 task.wait(2)
 
 testPackets.a:send({
-	first = "hello world",
 	second = 5,
 })
