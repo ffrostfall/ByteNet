@@ -80,34 +80,26 @@ function clientProcess.sendUnreliable(id: number, format: types.packetFormat, da
 end
 
 function clientProcess.start()
-	local remoteInstances: {
-		reliable: RemoteEvent?,
-		unreliable: UnreliableRemoteEvent?,
-	} = {
-		reliable = ReplicatedStorage:WaitForChild("ByteNetReliable"),
-		unreliable = ReplicatedStorage:WaitForChild("ByteNetUnreliable"),
-	}
-
-	if not remoteInstances.reliable or not remoteInstances.unreliable then
-		return
-	end
-
-	local reliableRemote = remoteInstances.reliable
-	local unreliableRemote = remoteInstances.unreliable
-
+	local reliableRemote = ReplicatedStorage:WaitForChild("ByteNetReliable")
 	reliableRemote.OnClientEvent:Connect(onClientEvent)
+
+	local unreliableRemote = ReplicatedStorage:WaitForChild("ByteNetUnreliable")
 	unreliableRemote.OnClientEvent:Connect(onClientEvent)
 
 	RunService.Heartbeat:Connect(function()
+		-- Again, checking if there's anything in the channel before we send it.
 		if reliable ~= nil then
 			load(reliable)
+
 			reliableRemote:FireServer(dumpLoadedChannel())
 
+			-- effectively clears the channel
 			reliable = nil
 		end
 
 		if unreliable ~= nil then
 			load(unreliable)
+
 			unreliableRemote:FireServer(dumpLoadedChannel())
 
 			unreliable = nil
