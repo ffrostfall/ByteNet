@@ -8,23 +8,26 @@ local types = require(script.Parent.Parent.types)
 local read = require(script.Parent.read)
 local bufferWriter = require(script.Parent.bufferWriter)
 
+-- All channelData is set to nil upon being sent which is why these are all optionals
 local globalReliable: channelData? = nil
 local globalUnreliable: channelData? = nil
 local perPlayerReliable: { [Player]: channelData? } = {}
 local perPlayerUnreliable: { [Player]: channelData? } = {}
 
+-- Shared with: src/process/client.luau (Infeasible to split this into another file)
 type channelData = {
 	cursor: number,
 	jobs: types.bufferQueue,
 }
 
+-- Cursor is copied, jobs is not.
 local cursor = 0
 local jobs = {}
 
 local function load(freshChannel: channelData?)
 	if not freshChannel then
 		cursor = 0
-		jobs = {}
+		jobs = {} -- It's important to note this creates a new channel and creates a new reference
 		bufferWriter.set(jobs)
 		return
 	end
@@ -37,15 +40,18 @@ end
 local function save(): channelData
 	return {
 		cursor = cursor,
-		jobs = jobs,
+		jobs = jobs, -- This saves the current reference to the jobs table, letting us switch it out later. Also important.
 	}
 end
 
+-- TODO handle invalid data better
 local function onServerEvent(player: Player, data)
+	-- Only accept buffer data
 	if not (typeof(data) == "buffer") then
 		return
 	end
 
+	-- Limit the amount of data
 	if buffer.len(data) >= 100000 then
 		warn("over 100K byte limit from player: " .. player.UserId)
 		return
@@ -55,10 +61,12 @@ local function onServerEvent(player: Player, data)
 end
 
 local function addPacketToLoadedChannel(id: number, format: types.packetFormat, data: { [string]: any })
+	-- packet ID
 	bufferWriter.u8(cursor, id)
 	cursor += 1
 
 	for _, value in format do
+		-- value[2] is the write function, value[3] is the key
 		cursor += (value[2] :: (cursor: number, value: any) -> number)(cursor, data[value[3] :: string])
 	end
 end
@@ -66,7 +74,10 @@ end
 local function dumpLoadedChannel(): buffer
 	local dumpBuffer = buffer.create(cursor)
 
+	-- remember, jobs[1] is the function, jobs[2] is the cursor, and jobs[3] is the value
+	-- iterate over all jobs in increments of 3, and call accordingly
 	for index = 1, #jobs, 3 do
+		-- We have to do this typecasting because luau doesn't have tuple tables yet
 		(jobs[index] :: (b: buffer, cursor: number, value: any) -> ())(
 			dumpBuffer,
 			jobs[index + 1] :: number,
@@ -76,11 +87,7 @@ local function dumpLoadedChannel(): buffer
 
 	return dumpBuffer
 end
-
-local function onPlayerAdded(player: Player)
-	perPlayerReliable[player] = nil
-	perPlayerUnreliable[player] = nil
-end
+-- No longer shared
 
 local serverProcess = {}
 
@@ -120,34 +127,29 @@ end
 
 function serverProcess.start()
 	local reliableRemote = Instance.new("RemoteEvent")
-	local unreliableRemote = Instance.new("UnreliableRemoteEvent")
-
 	reliableRemote.Name = "ByteNetReliable"
-	unreliableRemote.Name = "ByteNetUnreliable"
-
+	reliableRemote.OnServerEvent:Connect(onServerEvent)
 	reliableRemote.Parent = ReplicatedStorage
+
+	local unreliableRemote = Instance.new("UnreliableRemoteEvent")
+	unreliableRemote.Name = "ByteNetUnreliable"
+	unreliableRemote.OnServerEvent:Connect(onServerEvent)
 	unreliableRemote.Parent = ReplicatedStorage
 
-	for _, player in Players:GetPlayers() do
-		onPlayerAdded(player)
-	end
-
-	Players.PlayerAdded:Connect(onPlayerAdded)
-	Players.PlayerRemoving:Connect(function() end)
-
-	reliableRemote.OnServerEvent:Connect(onServerEvent)
-	unreliableRemote.OnServerEvent:Connect(onServerEvent)
-
 	RunService.Heartbeat:Connect(function()
+		-- Check if the channel has anything before trying to send it
 		if globalReliable ~= nil then
 			load(globalReliable)
+
 			reliableRemote:FireAllClients(dumpLoadedChannel())
 
+			-- Clear channel reference
 			globalReliable = nil
 		end
 
 		if globalUnreliable ~= nil then
 			load(globalUnreliable)
+
 			unreliableRemote:FireAllClients(dumpLoadedChannel())
 
 			globalUnreliable = nil
@@ -156,13 +158,17 @@ function serverProcess.start()
 		for _, player in Players:GetPlayers() do
 			if perPlayerReliable[player] ~= nil then
 				load(perPlayerReliable[player])
+
 				reliableRemote:FireClient(player, dumpLoadedChannel())
+
 				perPlayerReliable[player] = nil
 			end
 
 			if perPlayerUnreliable[player] ~= nil then
 				load(perPlayerUnreliable[player])
+
 				unreliableRemote:FireClient(player, dumpLoadedChannel())
+
 				perPlayerUnreliable[player] = nil
 			end
 		end

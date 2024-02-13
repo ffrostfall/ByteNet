@@ -1,3 +1,4 @@
+-- Used internally to define the format of a packet in an efficient way
 export type packetFormat = {
 	{
 		-- read | write | key
@@ -9,19 +10,23 @@ export type packetFormatElement =
 	| ((offset: number, value: any) -> number)
 	| string
 
+-- Used internally to efficiently handle the "deferred write" with buffers
 export type bufferQueue = { ((b: buffer, c: number, v: any) -> ()) | number | string | buffer }
 
+-- Used internally for serializing and deserializing all data types
 export type dataTypeInterface<T> = {
 	write: (cursor: number, value: T) -> number,
 	read: (b: buffer, cursor: number) -> (T, number),
 }
 
+-- Somewhat public facing: used as return result in definePacket
 type Packet<T> = {
 	sendToAll: (self: Packet<T>, data: T) -> (),
 	send: (self: Packet<T>, data: T, target: Player?) -> (),
 	listen: (self: Packet<T>, callback: (data: T, player: Player?) -> ()) -> (),
 }
 
+-- Library type
 export type ByteNet = {
 	definePacket: <T>(props: {
 		structure: T,

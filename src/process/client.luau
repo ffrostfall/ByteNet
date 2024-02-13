@@ -9,6 +9,7 @@ local function onClientEvent(receivedBuffer)
 	read(receivedBuffer)
 end
 
+-- Shared with: src/process/server.luau (Infeasible to split this into another file)
 type channelData = {
 	cursor: number,
 	jobs: types.bufferQueue,
@@ -59,6 +60,7 @@ local function dumpLoadedChannel(): buffer
 
 	return dumpBuffer
 end
+-- No longer shared
 
 local reliable: channelData? = nil
 local unreliable: channelData? = nil
