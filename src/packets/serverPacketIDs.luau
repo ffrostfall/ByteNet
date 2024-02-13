@@ -1,14 +1,15 @@
-local wallyInstanceManager = require(script.Parent.Parent.Parent.Parent.wallyInstanceManager)
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local packetMap = {}
-local packetStorage = Instance.new("Folder")
+local packetStorage = nil
 local idCounter = 0
 
 local serverPacketIDs = {}
 
 function serverPacketIDs.start()
-	packetStorage.Name = "packetStorage"
-	wallyInstanceManager.add(script.Parent.Parent.Parent, packetStorage)
+	packetStorage = Instance.new("Folder")
+	packetStorage.Name = "ByteNetPacketStorage"
+	packetStorage.Parent = ReplicatedStorage
 end
 
 function serverPacketIDs.assignPacket(packetContents: string, packet)

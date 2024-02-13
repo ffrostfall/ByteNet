@@ -1,4 +1,4 @@
-local wallyInstanceManager = require(script.Parent.Parent.Parent.Parent.wallyInstanceManager)
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local packetStorage = nil
 local packetMap = {}
@@ -6,10 +6,10 @@ local packetMap = {}
 local clientPacketIDs = {}
 
 function clientPacketIDs.start()
-	packetStorage = wallyInstanceManager.get(script.Parent.Parent.Parent, "packetStorage") :: Folder
+	packetStorage = ReplicatedStorage:FindFirstChild("ByteNetPacketStorage")
 
 	if not packetStorage then
-		packetStorage = wallyInstanceManager.waitForInstance(script.Parent.Parent.Parent, "packetStorage", 3) :: Folder
+		packetStorage = ReplicatedStorage:WaitForChild("ByteNetPacketStorage")
 	end
 end
 

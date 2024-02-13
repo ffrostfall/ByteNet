@@ -1,0 +1,36 @@
+site_name: ByteNet
+
+repo_url: https://github.com/ffrostflame/ByteNet
+
+### Build settings ###
+
+theme: readthedocs
+
+nav:
+  - Home: index.md
+theme:
+  name: material
+  palette:
+    scheme: slate
+  font:
+    text: Roboto
+    code: Fira Code
+  features:
+    - content.code.copy
+  extra_css:
+    - css/smoothscroll.css
+
+  icon:
+    repo: octicons/mark-github-16
+
+markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences

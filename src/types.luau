@@ -1,10 +1,19 @@
 export type packetFormat = {
 	{
-		writer: (b: buffer, offset: number, value: any) -> (),
-		reader: (b: buffer, offset: number) -> any,
-		key: string,
-		length: (value: any) -> number,
+		-- read | write | key
+		[number]: ((b: buffer, offset: number) -> (any, number)) | ((offset: number, value: any) -> number) | string,
 	}
+}
+export type packetFormatElement =
+	((b: buffer, offset: number) -> (any, number))
+	| ((offset: number, value: any) -> number)
+	| string
+
+export type bufferQueue = { ((b: buffer, c: number, v: any) -> ()) | number | string | buffer }
+
+export type dataTypeInterface<T> = {
+	write: (cursor: number, value: T) -> number,
+	read: (b: buffer, cursor: number) -> (T, number),
 }
 
 type Packet<T> = {
@@ -14,33 +23,29 @@ type Packet<T> = {
 }
 
 export type ByteNet = {
-	definePacket: <T>(structure: T, reliabilityType: ("reliable" | "unreliable")?) -> Packet<T>,
+	definePacket: <T>(props: {
+		structure: T,
+		reliabilityType: ("reliable" | "unreliable")?,
+	}) -> Packet<T>,
 
 	dataTypes: {
-		opt_uint8: () -> number?,
-		opt_int8: () -> number?,
+		bool: () -> boolean,
+		array: <T>(value: T) -> { [number]: T },
+		optional: <T>(value: T) -> T?,
 		uint8: () -> number,
-		int8: () -> number,
-
-		opt_uint16: () -> number?,
-		opt_int16: () -> number?,
 		uint16: () -> number,
-		int16: () -> number,
-
-		opt_uint32: () -> number?,
-		opt_int32: () -> number?,
 		uint32: () -> number,
+		int8: () -> number,
+		int16: () -> number,
 		int32: () -> number,
-
-		opt_float32: () -> number?,
-		opt_float64: () -> number?,
 		float32: () -> number,
 		float64: () -> number,
-
-		vec3: () -> Vector3,
 		string: () -> string,
-		bool: () -> boolean,
+		vec3: () -> Vector3,
+		vec2: () -> Vector2,
 		buff: () -> buffer,
+		cframe: () -> CFrame,
+		map: <K, V>(key: K, value: V) -> { [K]: V },
 	},
 }
 

@@ -1,16 +1,45 @@
+--!native
+--!optimize 2
 local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 
-local wallyInstanceManager = require(script.Parent.Parent.Parent.wallyInstanceManager)
 local types = require(script.Parent.Parent.types)
 local read = require(script.Parent.read)
-local sendChannel = require(script.Parent.sendChannel)
-local channels = {
-	players = {} :: { [Player]: { reliable: sendChannel.sendChannelType, unreliable: sendChannel.sendChannelType } },
+local bufferWriter = require(script.Parent.bufferWriter)
 
-	reliable = sendChannel(),
-	unreliable = sendChannel(),
+local globalReliable: channelData? = nil
+local globalUnreliable: channelData? = nil
+local perPlayerReliable: { [Player]: channelData? } = {}
+local perPlayerUnreliable: { [Player]: channelData? } = {}
+
+type channelData = {
+	cursor: number,
+	jobs: types.bufferQueue,
 }
+
+local cursor = 0
+local jobs = {}
+
+local function load(freshChannel: channelData?)
+	if not freshChannel then
+		cursor = 0
+		jobs = {}
+		bufferWriter.set(jobs)
+		return
+	end
+
+	cursor = freshChannel.cursor
+	jobs = freshChannel.jobs
+	bufferWriter.set(jobs)
+end
+
+local function save(): channelData
+	return {
+		cursor = cursor,
+		jobs = jobs,
+	}
+end
 
 local function onServerEvent(player: Player, data)
 	if not (typeof(data) == "buffer") then
@@ -25,21 +54,46 @@ local function onServerEvent(player: Player, data)
 	read(data)
 end
 
+local function addPacketToLoadedChannel(id: number, format: types.packetFormat, data: { [string]: any })
+	bufferWriter.u8(cursor, id)
+	cursor += 1
+
+	for _, value in format do
+		cursor += (value[2] :: (cursor: number, value: any) -> number)(cursor, data[value[3] :: string])
+	end
+end
+
+local function dumpLoadedChannel(): buffer
+	local dumpBuffer = buffer.create(cursor)
+
+	for index = 1, #jobs, 3 do
+		(jobs[index] :: (b: buffer, cursor: number, value: any) -> ())(
+			dumpBuffer,
+			jobs[index + 1] :: number,
+			jobs[index + 2]
+		)
+	end
+
+	return dumpBuffer
+end
+
 local function onPlayerAdded(player: Player)
-	channels.players[player] = {
-		reliable = sendChannel(),
-		unreliable = sendChannel(),
-	}
+	perPlayerReliable[player] = nil
+	perPlayerUnreliable[player] = nil
 end
 
 local serverProcess = {}
 
 function serverProcess.sendAllReliable(id: number, format: types.packetFormat, data: { [string]: any })
-	channels.reliable:add(id, format, data)
+	load(globalReliable)
+	addPacketToLoadedChannel(id, format, data)
+	globalReliable = save()
 end
 
 function serverProcess.sendAllUnreliable(id: number, format: types.packetFormat, data: { [string]: any })
-	channels.unreliable:add(id, format, data)
+	load(globalUnreliable)
+	addPacketToLoadedChannel(id, format, data)
+	globalUnreliable = save()
 end
 
 function serverProcess.sendPlayerReliable(
@@ -48,7 +102,9 @@ function serverProcess.sendPlayerReliable(
 	format: types.packetFormat,
 	data: { [string]: any }
 )
-	channels.players[player].reliable:add(id, format, data)
+	load(perPlayerReliable[player])
+	addPacketToLoadedChannel(id, format, data)
+	perPlayerReliable[player] = save()
 end
 
 function serverProcess.sendPlayerUnreliable(
@@ -57,53 +113,57 @@ function serverProcess.sendPlayerUnreliable(
 	format: types.packetFormat,
 	data: { [string]: any }
 )
-	channels.players[player].unreliable:add(id, format, data)
+	load(perPlayerUnreliable[player])
+	addPacketToLoadedChannel(id, format, data)
+	perPlayerUnreliable[player] = save()
 end
 
 function serverProcess.start()
-	local remoteInstances = {
-		reliable = Instance.new("RemoteEvent"),
-		unreliable = Instance.new("UnreliableRemoteEvent"),
-	}
+	local reliableRemote = Instance.new("RemoteEvent")
+	local unreliableRemote = Instance.new("UnreliableRemoteEvent")
 
-	remoteInstances.reliable.Name = "reliable"
-	remoteInstances.unreliable.Name = "unreliable"
+	reliableRemote.Name = "ByteNetReliable"
+	unreliableRemote.Name = "ByteNetUnreliable"
 
-	local byteNetInstance = script.Parent.Parent.Parent
-	wallyInstanceManager.add(byteNetInstance, remoteInstances.reliable)
-	wallyInstanceManager.add(byteNetInstance, remoteInstances.unreliable)
+	reliableRemote.Parent = ReplicatedStorage
+	unreliableRemote.Parent = ReplicatedStorage
 
 	for _, player in Players:GetPlayers() do
 		onPlayerAdded(player)
 	end
 
 	Players.PlayerAdded:Connect(onPlayerAdded)
-	Players.PlayerRemoving:Connect(function(player: Player) end)
+	Players.PlayerRemoving:Connect(function() end)
 
-	remoteInstances.reliable.OnServerEvent:Connect(onServerEvent)
-	remoteInstances.unreliable.OnServerEvent:Connect(onServerEvent)
+	reliableRemote.OnServerEvent:Connect(onServerEvent)
+	unreliableRemote.OnServerEvent:Connect(onServerEvent)
 
 	RunService.Heartbeat:Connect(function()
-		local reliableBuffer = channels.reliable:empty()
-		if reliableBuffer ~= nil then
-			remoteInstances.reliable:FireAllClients(reliableBuffer)
+		if globalReliable ~= nil then
+			load(globalReliable)
+			reliableRemote:FireAllClients(dumpLoadedChannel())
+
+			globalReliable = nil
 		end
 
-		local unreliableBuffer = channels.unreliable:empty()
-		if unreliableBuffer ~= nil then
-			remoteInstances.unreliable:FireAllClients(unreliableBuffer)
+		if globalUnreliable ~= nil then
+			load(globalUnreliable)
+			unreliableRemote:FireAllClients(dumpLoadedChannel())
+
+			globalUnreliable = nil
 		end
 
-		for player, playerChannels in channels.players do
-			local reliablePlayerBuffer = playerChannels.reliable:empty()
-			local unreliablePlayerBuffer = playerChannels.unreliable:empty()
-
-			if reliablePlayerBuffer ~= nil then
-				remoteInstances.reliable:FireClient(player, reliablePlayerBuffer)
+		for _, player in Players:GetPlayers() do
+			if perPlayerReliable[player] ~= nil then
+				load(perPlayerReliable[player])
+				reliableRemote:FireClient(player, dumpLoadedChannel())
+				perPlayerReliable[player] = nil
 			end
 
-			if unreliablePlayerBuffer ~= nil then
-				remoteInstances.unreliable:FireClient(player, unreliablePlayerBuffer)
+			if perPlayerUnreliable[player] ~= nil then
+				load(perPlayerUnreliable[player])
+				unreliableRemote:FireClient(player, dumpLoadedChannel())
+				perPlayerUnreliable[player] = nil
 			end
 		end
 	end)
