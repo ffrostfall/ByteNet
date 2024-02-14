@@ -1,27 +1,42 @@
 site_name: ByteNet
-
+repo_name: ffrostfall/ByteNet
 repo_url: https://github.com/ffrostflame/ByteNet
-
-### Build settings ###
-
-theme: readthedocs
 
 nav:
   - Home: index.md
+  - API:
+    - DataTypes:
+      - Primitives: api/dataTypes/Primitives.md
+      - Specials: api/dataTypes/Specials.md
+    - Functions:
+      - definePacket: api/functions/definePacket.md
+
 theme:
   name: material
+  favicon: assets/favicon.png
+  logo: assets/bytenetLogo.png
   palette:
     scheme: slate
+    primary: custom
+    accent: white
   font:
     text: Roboto
     code: Fira Code
   features:
     - content.code.copy
-  extra_css:
-    - css/smoothscroll.css
-
+    - navigation.tabs
+    - navigation.top
+    - navigation.sections
+    - navigation.instant
+    - navigation.indexes
+    - search.suggest
+    - search.highlight
   icon:
     repo: octicons/mark-github-16
+
+extra_css:
+  - assets/colors.css
+  - assets/home.css
 
 markdown_extensions:
   - pymdownx.highlight:
