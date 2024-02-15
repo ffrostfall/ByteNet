@@ -1,107 +1,122 @@
+--!native
+--!optimize 2
+local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 
-local currentRunContext = require(script.Parent.Parent.storage.currentRunContext)
-local packetReporter = require(script.Parent.Parent.logging.packetReporter)
-local clientPacketIDs = require(script.Parent.Parent.packets.identifiers.clientPacketIDs)
-local serverPacketIDs = require(script.Parent.Parent.packets.identifiers.serverPacketIDs)
-local clientProcess = require(script.Parent.Parent.process.client.clientProcess)
-local send = require(script.Parent.Parent.process.parsing.send)
-local serverProcess = require(script.Parent.Parent.process.server.serverProcess)
-local dataTypeList = require(script.Parent.Parent.storage.dataTypeList)
-local reliabilityTypeList = require(script.Parent.Parent.storage.reliabilityTypeList)
-local getUnique = require(script.Parent.getUnique)
+local types = require(script.Parent.Parent.types)
+local clientPacketIDs = require(script.Parent.Parent.packets.clientPacketIDs)
+local serverPacketIDs = require(script.Parent.Parent.packets.serverPacketIDs)
+local client = require(script.Parent.Parent.process.client)
+local server = require(script.Parent.Parent.process.server)
+
+local function getUnique(structure: { [string]: any })
+	local unique = ""
+
+	for key in structure do
+		unique ..= key
+	end
+
+	return unique
+end
 
 local packetPrototype = {}
 local packetMetatable = { __index = packetPrototype }
 export type packetType = typeof(setmetatable(
 	{} :: {
-		_id: number,
-		_order: { [number]: { string } },
-		_reliabilityType: reliabilityTypeList.reliabilityType,
-
-		_listeners: { [number]: (data: {}, player: Player) -> () },
-		_reporter: packetReporter.packetReporterType,
+		id: number,
+		reliabilityType: string,
+		listeners: { [number]: (data: {}, player: Player) -> () },
+		packetFormat: types.packetFormat,
 	},
 	packetMetatable
 ))
 
-function packetPrototype.sendToAll(self: packetType, data)
-	local packetBuffer = send(self._id, data, self._order)
-
-	serverProcess.sendEveryone(self._reliabilityType, packetBuffer)
+function packetPrototype.sendTo(self: packetType, data: {}, player: Player)
+	if RunService:IsServer() then
+		if self.reliabilityType == "reliable" then
+			server.sendPlayerReliable(player, self.id, self.packetFormat, data)
+		else
+			server.sendPlayerUnreliable(player, self.id, self.packetFormat, data)
+		end
+	end
 end
 
-function packetPrototype.send(self: packetType, data: { [string]: any }, target: Player?)
-	for _, v in self._order do
-		local key = v[1]
-		local dataType = v[2]
-
-		local value = data[key]
-		if value == nil then
-			self._reporter:error("missing key " .. key)
-			return
-		else
-			local dataTypeInfo = dataTypeList[dataType]
-			if not dataTypeInfo.typecheck(value) then
-				self._reporter:raiseTypeError(key, dataType, typeof(value))
-				return
-			end
-
-			if dataTypeInfo.checkBounds then
-				if not dataTypeInfo.checkBounds(value) then
-					self._reporter:raiseBoundsError(key, dataTypeInfo.min, dataTypeInfo.max, value)
-					return
+function packetPrototype.sendToAllExcept(self: packetType, data: {}, except: Player)
+	if RunService:IsServer() then
+		for _, player in Players:GetPlayers() do
+			if player ~= except then
+				if self.reliabilityType == "reliable" then
+					server.sendPlayerReliable(player, self.id, self.packetFormat, data)
+				else
+					server.sendPlayerUnreliable(player, self.id, self.packetFormat, data)
 				end
 			end
 		end
 	end
+end
 
-	local packetBuffer = send(self._id, data, self._order)
-
-	if RunService:IsServer() then
-		if target then
-			serverProcess.sendTo(target, self._reliabilityType, packetBuffer)
-		else
-			warn("no target specified")
-		end
-	elseif RunService:IsClient() then
-		clientProcess.send(self._reliabilityType, packetBuffer)
+function packetPrototype.sendToAll(self: packetType, data: {})
+	if self.reliabilityType == "reliable" then
+		server.sendAllReliable(self.id, self.packetFormat, data)
+	else
+		server.sendAllUnreliable(self.id, self.packetFormat, data)
 	end
 end
 
-function packetPrototype.listen(self: packetType, callback: (data: {}, player: Player?) -> ())
-	table.insert(self._listeners, callback)
+function packetPrototype.send(self: packetType, data: {})
+	if RunService:IsServer() then
+		if self.reliabilityType == "reliable" then
+			server.sendAllReliable(self.id, self.packetFormat, data)
+		else
+			server.sendAllUnreliable(self.id, self.packetFormat, data)
+		end
+	else
+		client.sendReliable(self.id, self.packetFormat, data)
+	end
 end
 
-return function(packetStructure: { [string]: any }, reliabilityType: reliabilityTypeList.reliabilityType): packetType
+function packetPrototype.listen(self: packetType, callback)
+	table.insert(self.listeners, callback)
+end
+
+type packetProps = {
+	structure: { [string]: types.dataTypeInterface<any> },
+	reliabilityType: "reliable" | "unreliable",
+	callbackBehavior: {
+		spawnThread: boolean,
+		allowMultiple: boolean,
+	},
+}
+return function(props: packetProps): packetType
 	local self = setmetatable({}, packetMetatable)
 
-	self._reliabilityType = reliabilityType or "reliable"
+	-- Basic properties: reliability type, "unique" which is used to get the packet ID, and set up listeners
+	self.reliabilityType = props.reliabilityType or "reliable"
+	self._unique = getUnique(props.structure)
+	self.id = if RunService:IsServer()
+		then serverPacketIDs.assignPacket(self._unique, self)
+		else clientPacketIDs.assignPacket(self._unique, self)
+	self.listeners = {}
 
-	self._id = 0
-	self._unique = getUnique(packetStructure)
-	if currentRunContext == "server" then
-		self._id = serverPacketIDs.assignPacket(self._unique, self)
-	else
-		self._id = clientPacketIDs.assignPacket(self._unique, self)
-	end
-
-	self._reporter = packetReporter(self._id)
-
-	-- structure stuff
-	self._order = {}
-	for key, value in packetStructure do
-		table.insert(self._order, {
+	self.packetFormat = {}
+	for key, dataType in props.structure do
+		-- Fetch all relevant data from the structure (read, write, key), and then insert it into the packet format
+		local value: { [number]: types.packetFormatElement } = {
+			dataType.read,
+			dataType.write,
 			key,
-			value,
-		})
+		}
+
+		table.insert(self.packetFormat, value)
 	end
 
-	table.sort(self._order, function(a, b)
-		return a[1] < b[1]
-	end)
+	-- Sort the format so that way it's in a static order shared across both client and server
+	table.sort(self.packetFormat, function(a, b)
+		local keyA = a[3]
+		local keyB = b[3]
 
-	self._listeners = {}
+		return keyA > keyB
+	end)
 
 	return self
 end

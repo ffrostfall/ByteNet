@@ -7,6 +7,7 @@
   "license": "MIT",
   "module": "commonjs",
   "devDependencies": {
-    "@rbxts/types": "^1.0.737"
+    "@rbxts/types": "^1.0.737",
+	"typescript": "^5.3.3"
   }
 }

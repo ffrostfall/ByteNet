@@ -1,9 +1,27 @@
 local RunService = game:GetService("RunService")
 
-local clientPacketIDs = require(script.packets.identifiers.clientPacketIDs)
-local serverPacketIDs = require(script.packets.identifiers.serverPacketIDs)
-local clientProcess = require(script.process.client.clientProcess)
-local serverProcess = require(script.process.server.serverProcess)
+local clientPacketIDs = require(script.packets.clientPacketIDs)
+local serverPacketIDs = require(script.packets.serverPacketIDs)
+local packet = require(script.packets.packet)
+local clientProcess = require(script.process.client)
+local array = require(script.dataTypes.array)
+local bool = require(script.dataTypes.bool)
+local buff = require(script.dataTypes.buff)
+local cframe = require(script.dataTypes.cframe)
+local float32 = require(script.dataTypes.float32)
+local float64 = require(script.dataTypes.float64)
+local int16 = require(script.dataTypes.int16)
+local int32 = require(script.dataTypes.int32)
+local int8 = require(script.dataTypes.int8)
+local map = require(script.dataTypes.map)
+local optional = require(script.dataTypes.optional)
+local string = require(script.dataTypes.string)
+local uint16 = require(script.dataTypes.uint16)
+local uint32 = require(script.dataTypes.uint32)
+local uint8 = require(script.dataTypes.uint8)
+local vec2 = require(script.dataTypes.vec2)
+local vec3 = require(script.dataTypes.vec3)
+local serverProcess = require(script.process.server)
 local types = require(script.types)
 
 if RunService:IsServer() then
@@ -14,98 +32,26 @@ else
 	clientPacketIDs.start()
 end
 
---[=[
-	@class ByteNet
-	
-	The root interface for ByteNet.
-]=]
-
---[=[
-	@function definePacket
-	@within ByteNet
-	
-	@param reliabilityType "reliable" | "unreliable"
-	@param structure { [string]: DataType }
-	
-	@return Packet
-]=]
-
---[=[
-	@type DataType [arbitrary]
-	@within ByteNet
-	Declares the type of data of a field.
-]=]
-
---[=[
-	@interface dataTypes
-	@within ByteNet
-	.string DataType
-	.uint8 DataType
-	.int8 DataType
-	.uint16 DataType
-	.int16 DataType
-	.uint32 DataType
-	.int32 DataType
-	.f32 DataType
-	.f64 DataType
-	.v3 DataType
-	.bool DataType
-]=]
-
---[=[
-	@class Packet
-	
-	The class returned by `ByteNet.definePacket`. Packets are utilized to send data between the server and client.
-]=]
-
---[=[
-	@method sendToAll
-	@within Packet
-	@server
-	
-	@param data { [string]: any }
-	
-	Sends data to all players.
-]=]
-
---[=[
-	@method send
-	@within Packet
-	
-	@param data { [string]: any }
-	@param target Player?
-	
-	If on the client, sends data to the server. If on the server, sends data to a specific player.
-]=]
-
---[=[
-	@method listen
-	@within Packet
-	
-	@param callback (data: {[string]: any}, player: Player?) -> ()
-	
-	When the packet is received, the callback is called with the data, and if on the server, the player who sent the packet.
-]=]
-
 return (
 	table.freeze({
-		definePacket = require(script.packets.packet),
+		definePacket = packet,
 
-		dataTypes = {
-			string = "string",
-			uint8 = "uint8",
-			uint16 = "uint16",
-			uint32 = "uint32",
-
-			int8 = "int8",
-			int16 = "int16",
-			int32 = "int32",
-
-			float32 = "float32",
-			float64 = "float64",
-			vec3 = "vec3",
-			bool = "bool",
-			buff = "buff",
-		},
+		array = array,
+		bool = bool(),
+		optional = optional,
+		uint8 = uint8(),
+		uint16 = uint16(),
+		uint32 = uint32(),
+		int8 = int8(),
+		int16 = int16(),
+		int32 = int32(),
+		float32 = float32(),
+		float64 = float64(),
+		cframe = cframe(),
+		string = string(),
+		vec2 = vec2(),
+		vec3 = vec3(),
+		buff = buff(),
+		map = map,
 	}) :: any
 ) :: types.ByteNet

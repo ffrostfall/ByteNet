@@ -1,0 +1,39 @@
+#nav__link {
+	--md-primary-fg-color: #000000;
+}
+
+.md-header {
+	background-color: #001127;
+}
+.md-tabs {
+	background-color: #001127;
+}
+.md-ellipsis {
+	color: rgb(255, 255, 255);
+}
+
+.md-typeset p {
+	color: white
+}
+
+body {
+	--md-primary-bg-color: #e6f9ff;
+}
+
+[data-md-color-scheme="slate"] {
+	--md-code-fg-color:                rgb(26, 26, 26);
+	--md-code-bg-color:                rgb(51, 51, 51);
+	--md-code-hl-color:                rgb(255, 255, 255);
+	--md-code-hl-number-color:         hsl(290, 60%, 70%);
+	--md-code-hl-special-color:        rgb(255, 255, 255);
+	--md-code-hl-function-color:       rgb(255, 255, 255);
+	--md-code-hl-constant-color:       rgb(233, 126, 126);
+	--md-code-hl-keyword-color:        hsl(187, 75%, 60%);
+	--md-code-hl-string-color:         hsl(330, 80%, 77%);
+	--md-code-hl-name-color:           rgb(253, 248, 255);
+	--md-code-hl-operator-color:       rgb(255, 182, 222);
+	--md-code-hl-punctuation-color:    hsl(61, 100%, 72%);
+	--md-code-hl-comment-color:        hsl(329, 24%, 51%);
+	--md-code-hl-generic-color:        rgb(165, 79, 79);
+	--md-code-hl-variable-color:       rgb(255, 147, 147);
+}

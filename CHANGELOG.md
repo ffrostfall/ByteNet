@@ -4,6 +4,13 @@ This project uses [semantic versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
+## version 0.3.0
+
+### Improvements
+- Rewrote client/server processing. Should drastically improve stability and performance.
+
+---
+
 ## version 0.2.1
 
 ### Fixes

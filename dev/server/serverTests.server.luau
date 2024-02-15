@@ -1,14 +1,57 @@
+--!native
+--!optimize 2
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
 
 local testPackets = require(ReplicatedStorage.shared.testPackets)
 
-Players.PlayerAdded:Connect(function(player)
-	task.wait(1)
-	testPackets.a:send({ first = "testB", second = math.random(1, 8) }, player)
+local data = {
+	a = false,
+	b = { true, false, false },
+	c = { { false }, { true } },
+	d = nil,
+	e = { [8] = 4 },
+	f = {
+		[Vector3.new(15, 15, 15)] = 2554,
+	},
+}
+
+RunService.Heartbeat:Connect(function()
+	--[[for i = 1, 100 do
+		ReplicatedStorage.RemoteEvent:FireAllClients({
+			a = false,
+			b = { true, false, false },
+			c = { { false }, { true } },
+			d = nil,
+			e = { [8] = 4 },
+			f = {
+				[Vector3.new(15, 15, 15)] = 2554,
+			},
+		})
+	end]]
+	debug.profilebegin("send")
+	for _ = 1, 100 do
+		testPackets.a:sendToAll(data)
+	end
+	debug.profileend()
 end)
 
-testPackets.a:listen(function(data)
+Players.PlayerAdded:Connect(function()
+	task.wait(1)
+	testPackets.a:sendToAll({
+		a = false,
+		b = { true, false, false },
+		c = { { false }, { true } },
+		d = nil,
+		e = { [8] = 4 },
+		f = {
+			[Vector3.new(15, 15, 15)] = 2554,
+		},
+	})
+end)
+
+testPackets.a:listen(function(a)
 	print("Confirming client -> server")
-	print(data)
+	print(a)
 end)
