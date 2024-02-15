@@ -21,7 +21,7 @@ type channelData = {
 }
 
 -- Cursor is copied, jobs is not.
-local cursor = 0
+local cursor: number = 0
 local jobs = {}
 
 local function load(freshChannel: channelData?)
@@ -57,7 +57,7 @@ local function onServerEvent(player: Player, data)
 		return
 	end
 
-	read(data)
+	read(data, player)
 end
 
 local function addPacketToLoadedChannel(id: number, format: types.packetFormat, data: { [string]: any })
@@ -126,12 +126,12 @@ function serverProcess.sendPlayerUnreliable(
 end
 
 function serverProcess.start()
-	local reliableRemote = Instance.new("RemoteEvent")
+	local reliableRemote: RemoteEvent = Instance.new("RemoteEvent")
 	reliableRemote.Name = "ByteNetReliable"
 	reliableRemote.OnServerEvent:Connect(onServerEvent)
 	reliableRemote.Parent = ReplicatedStorage
 
-	local unreliableRemote = Instance.new("UnreliableRemoteEvent")
+	local unreliableRemote: UnreliableRemoteEvent = Instance.new("UnreliableRemoteEvent")
 	unreliableRemote.Name = "ByteNetUnreliable"
 	unreliableRemote.OnServerEvent:Connect(onServerEvent)
 	unreliableRemote.Parent = ReplicatedStorage

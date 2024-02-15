@@ -4,12 +4,13 @@ repo_url: https://github.com/ffrostflame/ByteNet
 
 nav:
   - Home: index.md
-  - API:
+  - Documentation:
+    - Packets:
+      - definePacket: api/functions/definePacket.md
     - DataTypes:
       - Primitives: api/dataTypes/Primitives.md
       - Specials: api/dataTypes/Specials.md
-    - Functions:
-      - definePacket: api/functions/definePacket.md
+
 
 theme:
   name: material
@@ -45,7 +46,11 @@ markdown_extensions:
       pygments_lang_class: true
   - pymdownx.inlinehilite
   - pymdownx.snippets
-  - pymdownx.superfences
   - admonition
   - pymdownx.details
+  - pymdownx.extra
   - pymdownx.superfences
+  - attr_list
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg

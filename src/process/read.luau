@@ -9,7 +9,7 @@ local retrievePacketFromID = (
 	if RunService:IsServer() then serverPacketIDs.getPacketFromID else clientPacketIDs.getPacketFromID
 ) :: (packetID: number) -> any
 
-return function(incomingBuffer: buffer)
+return function(incomingBuffer: buffer, player: Player?)
 	local length = buffer.len(incomingBuffer)
 	local readCursor = 0
 
@@ -37,7 +37,7 @@ return function(incomingBuffer: buffer)
 		end
 
 		for _, listener in packet.listeners do
-			task.spawn(listener, deserialized)
+			task.spawn(listener, deserialized, player)
 		end
 	end
 end

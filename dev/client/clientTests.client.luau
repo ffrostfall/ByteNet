@@ -6,7 +6,7 @@ local testPackets = require(ReplicatedStorage.shared.testPackets)
 	--print(data)
 end)]]
 
-testPackets.a:listen(function(data)
+testPackets.a:listen(function()
 	--print("Confirming server -> client")
 	--print(data)
 end)

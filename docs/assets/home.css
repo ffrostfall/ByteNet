@@ -19,8 +19,59 @@
 #bytenet-header h1 {
 	font-size: 2.5em;
 	font-weight: bolder;
-	margin-bottom: 0;
+	margin-bottom: 10px;
 	color: white;
+}
+
+.docs h1 {
+	font-size: 2em;
+	font-weight: bold;
+	margin-bottom: 10px;
+	color: white;
+}
+
+.md-typeset h1 {
+	margin-bottom: 1cm;
+	color: white;
+	font-weight: bold;
+}
+
+.md-typeset h2 {
+	color: white;
+	margin-top: 10px;
+	margin-bottom: 0px;
+}
+
+.md-typeset h3#there-are-drawbacks-to-using-these {
+	font-weight: bolder;
+	color: #ff1744;
+	margin-top: 10px;
+	margin-bottom: 0px;
+	font-size: 1.5em;
+}
+
+.md-typeset .admonition.danger li {
+	font-size: 1.2em;
+	color: #ff4a6f
+}
+
+.md-typeset .admonition.danger {
+	background-color: #4b071563;
+}
+
+.md-grid {
+	max-width: 75%;
+}
+
+.md-typeset ul li {
+	margin-bottom: 0px;
+	margin-top: 0px;
+	color: rgb(255, 223, 163);
+}
+
+.md-typeset code {
+	color: #e6f9ff;
+	background-color: rgb(26, 26, 26);
 }
 
 #bytenet-header h2 {
@@ -41,7 +92,7 @@
 	font-weight: lighter;
 	margin-top: 5px;
 	margin-bottom: 15px;
-	color: rgb(219, 254, 255);
+	color: rgb(255, 255, 255);
 }
 
 #bytenet-header #small {
