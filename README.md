@@ -7,6 +7,8 @@
 
 ## Simple, buffer-based networking.
 
+[GitHub](https://github.com/ffrostflame/ByteNet) | [Documentation](https://ffrostflame.github.io/ByteNet/)
+
 </div>
 
 ByteNet is an networking library which takes your Luau data, and serializes it into buffers. On the other end, ByteNet deserializes your data, and then feeds it back to your Luau code. You don't need to worry about type validation, optimization, packet structure, etc. ByteNet does all the hard parts for you! Strictly typed with an incredibly basic API that explains itself, ByteNet makes networking simple, easy, and quick. There's very few concepts you need to grasp in order to use ByteNet; it has an incredibly minimalistic & simplistic, yet powerful API.
