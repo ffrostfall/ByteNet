@@ -26,8 +26,11 @@ local jobs = {}
 
 local function load(freshChannel: channelData?)
 	if not freshChannel then
+		-- It's important to note this creates a new channel and creates a new reference
+		-- It is the only way new channels are created
 		cursor = 0
-		jobs = {} -- It's important to note this creates a new channel and creates a new reference
+		-- We assume that there's going to be at least 16 elements in the channel if it exists just to speed things up
+		jobs = table.create(16)
 		bufferWriter.set(jobs)
 		return
 	end
@@ -78,11 +81,11 @@ local function dumpLoadedChannel(): buffer
 	-- iterate over all jobs in increments of 3, and call accordingly
 	for index = 1, #jobs, 3 do
 		-- We have to do this typecasting because luau doesn't have tuple tables yet
-		(jobs[index] :: (b: buffer, cursor: number, value: any) -> ())(
-			dumpBuffer,
-			jobs[index + 1] :: number,
-			jobs[index + 2]
-		)
+		-- It's ugly I know, but it's the only way to get it to work
+		local job, position, value: any =
+			jobs[index] :: (b: buffer, cursor: number, value: any) -> (), jobs[index + 1] :: number, jobs[index + 2]
+
+		job(dumpBuffer, position, value)
 	end
 
 	return dumpBuffer

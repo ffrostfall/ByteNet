@@ -5,8 +5,7 @@
 		
 		"ReplicatedStorage": {
 			"Packages": {
-				"$path": "Packages",
-				
+				"$className": "Folder",
 				"ByteNet": {
 					"$path": "src"
 				}
