@@ -1,3 +1,4 @@
+--!strict
 --!native
 --!optimize 2
 local Players = game:GetService("Players")
@@ -9,7 +10,8 @@ local serverPacketIDs = require(script.Parent.Parent.packets.serverPacketIDs)
 local client = require(script.Parent.Parent.process.client)
 local server = require(script.Parent.Parent.process.server)
 
-local function getUnique(structure: { [string]: any })
+local moduleRunContext: "server" | "client" = if RunService:IsServer() then "server" else "client"
+local function getUnique(structure: { [string]: any }): string
 	local unique = ""
 
 	for key in structure do
@@ -27,52 +29,41 @@ export type packetType = typeof(setmetatable(
 		reliabilityType: string,
 		listeners: { [number]: (data: {}, player: Player) -> () },
 		packetFormat: types.packetFormat,
+
+		_processSendFunction: (player: Player, id: number, format: types.packetFormat, data: {}) -> (),
+		_processSendAllFunction: (id: number, format: types.packetFormat, data: {}) -> (),
+		_clientSendFunction: (id: number, format: types.packetFormat, data: {}) -> (),
 	},
 	packetMetatable
 ))
 
 function packetPrototype.sendTo(self: packetType, data: {}, player: Player)
-	if RunService:IsServer() then
-		if self.reliabilityType == "reliable" then
-			server.sendPlayerReliable(player, self.id, self.packetFormat, data)
-		else
-			server.sendPlayerUnreliable(player, self.id, self.packetFormat, data)
-		end
-	end
+	assert(moduleRunContext == "server", "The 'sendTo' method can only be called on the server")
+
+	self._processSendFunction(player, self.id, self.packetFormat, data)
 end
 
 function packetPrototype.sendToAllExcept(self: packetType, data: {}, except: Player)
-	if RunService:IsServer() then
-		for _, player in Players:GetPlayers() do
-			if player ~= except then
-				if self.reliabilityType == "reliable" then
-					server.sendPlayerReliable(player, self.id, self.packetFormat, data)
-				else
-					server.sendPlayerUnreliable(player, self.id, self.packetFormat, data)
-				end
-			end
+	assert(moduleRunContext == "server", "The 'sendToAllExcept' method can only be called on the server")
+
+	local id, format = self.id, self.packetFormat
+	for _, player: Player in Players:GetPlayers() do
+		if player ~= except then
+			self._processSendFunction(player, id, format, data)
 		end
 	end
 end
 
 function packetPrototype.sendToAll(self: packetType, data: {})
-	if self.reliabilityType == "reliable" then
-		server.sendAllReliable(self.id, self.packetFormat, data)
-	else
-		server.sendAllUnreliable(self.id, self.packetFormat, data)
-	end
+	assert(moduleRunContext == "server", "The 'sendToAll' method can only be called on the server")
+
+	self._processSendAllFunction(self.id, self.packetFormat, data)
 end
 
 function packetPrototype.send(self: packetType, data: {})
-	if RunService:IsServer() then
-		if self.reliabilityType == "reliable" then
-			server.sendAllReliable(self.id, self.packetFormat, data)
-		else
-			server.sendAllUnreliable(self.id, self.packetFormat, data)
-		end
-	else
-		client.sendReliable(self.id, self.packetFormat, data)
-	end
+	assert(moduleRunContext == "client", "The 'send' method can only be called on the client")
+
+	self._clientSendFunction(self.id, self.packetFormat, data)
 end
 
 function packetPrototype.listen(self: packetType, callback)
@@ -93,10 +84,24 @@ return function(props: packetProps): packetType
 	-- Basic properties: reliability type, "unique" which is used to get the packet ID, and set up listeners
 	self.reliabilityType = props.reliabilityType or "reliable"
 	self._unique = getUnique(props.structure)
-	self.id = if RunService:IsServer()
+	self.id = if moduleRunContext == "server"
 		then serverPacketIDs.assignPacket(self._unique, self)
 		else clientPacketIDs.assignPacket(self._unique, self)
 	self.listeners = {}
+
+	if moduleRunContext == "server" then
+		self._processSendFunction = if self.reliabilityType == "reliable"
+			then server.sendPlayerReliable
+			else server.sendPlayerUnreliable
+
+		self._processSendAllFunction = if self.reliabilityType == "reliable"
+			then server.sendAllReliable
+			else server.sendAllUnreliable
+	elseif moduleRunContext == "client" then
+		self._clientSendFunction = if self.reliabilityType == "reliable"
+			then client.sendReliable
+			else client.sendUnreliable
+	end
 
 	self.packetFormat = {}
 	for key, dataType in props.structure do

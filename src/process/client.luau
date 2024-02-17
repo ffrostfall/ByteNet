@@ -10,73 +10,58 @@ local function onClientEvent(receivedBuffer)
 end
 
 -- Shared with: src/process/server.luau (Infeasible to split this into another file)
-type channelData = {
-	cursor: number,
-	jobs: types.bufferQueue,
+local EMPTY: types.channelData = {
+	cursor = 0,
+	size = 64,
+	buff = nil :: any,
 }
 
-local cursor = 0
-local jobs = {}
-
-local function load(freshChannel: channelData?)
+local function load(freshChannel: types.channelData?)
 	if not freshChannel then
-		cursor = 0
-		jobs = {}
-		bufferWriter.set(jobs)
+		local newChannel = table.clone(EMPTY)
+		newChannel.buff = buffer.create(64)
+		bufferWriter.load(newChannel)
 		return
 	end
 
-	cursor = freshChannel.cursor
-	jobs = freshChannel.jobs
-	bufferWriter.set(jobs)
+	bufferWriter.load(freshChannel)
 end
 
-local function save(): channelData
-	return {
-		cursor = cursor,
-		jobs = jobs,
-	}
-end
-
-local function addPacketToLoadedChannel(id: number, format: types.packetFormat, data: { [string]: any })
-	bufferWriter.u8(cursor, id)
-	cursor += 1
-
+local function addPacketToLoadedChannel(format: types.packetFormat, data: { [string]: any })
 	for _, value in format do
-		cursor += (value[2] :: (cursor: number, value: any) -> number)(cursor, data[value[3] :: string])
+		-- value[2] is the write function, value[3] is the key
+		(value[2] :: (cursor: number, value: any) -> number)(data[value[3] :: string])
 	end
 end
 
-local function dumpLoadedChannel(): buffer
-	local dumpBuffer = buffer.create(cursor)
-
-	for index = 1, #jobs, 3 do
-		(jobs[index] :: (b: buffer, cursor: number, value: any) -> ())(
-			dumpBuffer,
-			jobs[index + 1] :: number,
-			jobs[index + 2]
-		)
-	end
-
+local function dump(channel: types.channelData): buffer
+	local dumpBuffer = buffer.create(channel.cursor)
+	buffer.copy(dumpBuffer, 0, channel.buff, 0, channel.cursor)
 	return dumpBuffer
 end
 -- No longer shared
 
-local reliable: channelData? = nil
-local unreliable: channelData? = nil
+local reliable: types.channelData? = nil
+local unreliable: types.channelData? = nil
 
 local clientProcess = {}
 
 function clientProcess.sendReliable(id: number, format: types.packetFormat, data: { [string]: any })
-	load(reliable)
-	addPacketToLoadedChannel(id, format, data)
-	reliable = save()
+	reliable = load(reliable)
+
+	bufferWriter.u8(id)
+	addPacketToLoadedChannel(format, data)
+
+	reliable = bufferWriter.export()
 end
 
 function clientProcess.sendUnreliable(id: number, format: types.packetFormat, data: { [string]: any })
-	load(unreliable)
-	addPacketToLoadedChannel(id, format, data)
-	unreliable = save()
+	unreliable = load(unreliable)
+
+	bufferWriter.u8(id)
+	addPacketToLoadedChannel(format, data)
+
+	unreliable = bufferWriter.export()
 end
 
 function clientProcess.start()
@@ -89,18 +74,14 @@ function clientProcess.start()
 	RunService.Heartbeat:Connect(function()
 		-- Again, checking if there's anything in the channel before we send it.
 		if reliable ~= nil then
-			load(reliable)
-
-			reliableRemote:FireServer(dumpLoadedChannel())
+			reliableRemote:FireServer(dump(reliable))
 
 			-- effectively clears the channel
 			reliable = nil
 		end
 
 		if unreliable ~= nil then
-			load(unreliable)
-
-			unreliableRemote:FireServer(dumpLoadedChannel())
+			unreliableRemote:FireServer(dump(unreliable))
 
 			unreliable = nil
 		end

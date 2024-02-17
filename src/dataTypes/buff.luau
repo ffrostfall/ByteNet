@@ -3,6 +3,7 @@ local types = require(script.Parent.Parent.types)
 
 local u16 = bufferWriter.u16
 local copy = bufferWriter.copy
+local dyn_alloc = bufferWriter.dyn_alloc
 
 local buff = {
 	read = function(b: buffer, cursor: number)
@@ -14,14 +15,13 @@ local buff = {
 
 		return freshBuffer, length + 2
 	end,
-	write = function(cursor: number, data: buffer)
+	write = function(data: buffer)
 		local length = buffer.len(data)
+		dyn_alloc(length + 2)
 
 		-- write the length of the buffer, then the buffer itself
-		u16(cursor, length)
-		copy(cursor + 2, data)
-
-		return length + 2
+		u16(length)
+		copy(data)
 	end,
 }
 

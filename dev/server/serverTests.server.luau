@@ -18,18 +18,6 @@ local data = {
 }
 
 RunService.Heartbeat:Connect(function()
-	--[[for i = 1, 100 do
-		ReplicatedStorage.RemoteEvent:FireAllClients({
-			a = false,
-			b = { true, false, false },
-			c = { { false }, { true } },
-			d = nil,
-			e = { [8] = 4 },
-			f = {
-				[Vector3.new(15, 15, 15)] = 2554,
-			},
-		})
-	end]]
 	debug.profilebegin("send")
 	for _ = 1, 100 do
 		testPackets.a:sendToAll(data)

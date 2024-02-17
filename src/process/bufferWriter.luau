@@ -17,94 +17,114 @@
 ]]
 local types = require(script.Parent.Parent.types)
 
-local current: types.bufferQueue
+local current: types.channelData
+
+local size: number
+local cursor: number
+local buff: buffer
+
+local function alloc(bytes: number)
+	if cursor + bytes >= size then
+		size = math.floor((size * 1.5))
+
+		local newBuffer = buffer.create(size)
+		buffer.copy(newBuffer, 0, buff)
+
+		buff = newBuffer
+	end
+end
+
+local function dyn_alloc(bytes: number)
+	if cursor + bytes >= size then
+		while cursor + bytes >= size do
+			size = math.floor((size * 1.5))
+		end
+
+		local newBuffer = buffer.create(size)
+		buffer.copy(newBuffer, 0, buff)
+
+		buff = newBuffer
+	end
+end
 
 local bufferWriter = {}
 
-function bufferWriter.u8(cursor: number, value: number)
-	table.insert(current, buffer.writeu8)
-	table.insert(current, cursor)
-	table.insert(current, value)
-	return 1
+bufferWriter.alloc = alloc
+bufferWriter.dyn_alloc = dyn_alloc
+
+function bufferWriter.u8(value: number)
+	buffer.writeu8(buff, cursor, value)
+	cursor += 1
 end
 
-function bufferWriter.i8(cursor: number, value: number)
-	table.insert(current, buffer.writei8)
-	table.insert(current, cursor)
-	table.insert(current, value)
-	return 1
+function bufferWriter.i8(value: number)
+	buffer.writei8(buff, cursor, value)
+	cursor += 1
 end
 
-function bufferWriter.u16(cursor: number, value: number)
-	table.insert(current, buffer.writeu16)
-	table.insert(current, cursor)
-	table.insert(current, value)
-	return 2
+function bufferWriter.u16(value: number)
+	buffer.writeu16(buff, cursor, value)
+	cursor += 2
 end
 
-function bufferWriter.i16(cursor: number, value: number)
-	table.insert(current, buffer.writei8)
-	table.insert(current, cursor)
-	table.insert(current, value)
-	return 2
+function bufferWriter.i16(value: number)
+	buffer.writeu16(buff, cursor, value)
+	cursor += 2
 end
 
-function bufferWriter.u32(cursor: number, value: number)
-	table.insert(current, buffer.writeu32)
-	table.insert(current, cursor)
-	table.insert(current, value)
-	return 4
+function bufferWriter.u32(value: number)
+	buffer.writeu32(buff, cursor, value)
+	cursor += 4
 end
 
-function bufferWriter.writestring(cursor: number, value: string)
-	table.insert(current, buffer.writestring)
-	table.insert(current, cursor)
-	table.insert(current, value)
+function bufferWriter.writestring(value: string)
+	buffer.writestring(buff, cursor, value)
+	cursor += string.len(value)
 end
 
-function bufferWriter.i32(cursor: number, value: number)
-	table.insert(current, buffer.writei8)
-	table.insert(current, cursor)
-	table.insert(current, value)
-	return 4
+function bufferWriter.i32(value: number)
+	buffer.writei32(buff, cursor, value)
+	cursor += 4
 end
 
-function bufferWriter.f32(cursor: number, value: number)
-	table.insert(current, buffer.writef32)
-	table.insert(current, cursor)
-	table.insert(current, value)
-	return 4
+function bufferWriter.f32(value: number)
+	buffer.writef32(buff, cursor, value)
+	cursor += 4
 end
 
-function bufferWriter.f64(cursor: number, value: number)
-	table.insert(current, buffer.writef64)
-	table.insert(current, cursor)
-	table.insert(current, value)
-	return 8
+function bufferWriter.f64(value: number)
+	buffer.writef64(buff, cursor, value)
+	cursor += 8
 end
 
-function bufferWriter.copy(targetOffset, source)
-	table.insert(current, buffer.copy)
-	table.insert(current, targetOffset)
-	table.insert(current, source)
+function bufferWriter.copy(value)
+	buffer.copy(buff, cursor, value)
+	cursor += buffer.len(value)
 end
 
-function bufferWriter.btrue(cursor: number)
-	table.insert(current, buffer.writeu8)
-	table.insert(current, cursor)
-	table.insert(current, 1)
-	return 1
+function bufferWriter.btrue()
+	buffer.writeu8(buff, cursor, 1)
+	cursor += 1
 end
 
-function bufferWriter.bfalse(cursor: number)
-	table.insert(current, buffer.writeu8)
-	table.insert(current, cursor)
-	table.insert(current, 0)
-	return 1
+function bufferWriter.bfalse()
+	buffer.writeu8(buff, cursor, 0)
+	cursor += 1
 end
 
-function bufferWriter.set(collector)
-	current = collector
+function bufferWriter.load(channel: types.channelData)
+	current = channel
+	size = channel.size
+	cursor = channel.cursor
+	buff = channel.buff
+end
+
+function bufferWriter.export()
+	current.size = size
+	current.cursor = cursor
+	current.buff = buff
+
+	return current
 end
 
 return bufferWriter
