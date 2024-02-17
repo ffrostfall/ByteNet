@@ -9,6 +9,8 @@ This project uses [semantic versioning](https://semver.org/spec/v2.0.0.html).
 ### Improvements
 - Rewrote serialization to use an allocator w/ resizing instead of using "deferred write" functions. Should be an incredibly large performance boost.
 
+---
+
 ## version 0.3.0
 
 ### Added
