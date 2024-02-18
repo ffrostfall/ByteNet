@@ -4,27 +4,8 @@
 		"$className": "DataModel",
 		
 		"ReplicatedStorage": {
-			"Packages": {
-				"$path": "Packages",
-				
-				"ByteNet": {
-					"$path": "src"
-				}
-			},
-			"shared": {
-				"$path": "dev/shared"
-			}
-		},
-		
-		"ServerScriptService": {
-			"server": {
-				"$path": "dev/server"
-			}
-		},
-		
-		"StarterPlayer": {
-			"StarterPlayerScripts": {
-				"$path": "dev/client"
+			"ByteNet": {
+				"$path": "src"
 			}
 		}
 	}
