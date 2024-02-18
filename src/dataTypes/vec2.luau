@@ -2,6 +2,7 @@ local bufferWriter = require(script.Parent.Parent.process.bufferWriter)
 local types = require(script.Parent.Parent.types)
 
 local f32 = bufferWriter.f32
+local alloc = bufferWriter.alloc
 
 local vec2 = {
 	--[[
@@ -12,11 +13,10 @@ local vec2 = {
 		return Vector2.new(buffer.readf32(b, cursor), buffer.readf32(b, cursor + 4)), 8
 	end,
 
-	write = function(cursor: number, value: Vector2)
-		f32(cursor, value.X)
-		f32(cursor + 4, value.Y)
-
-		return 8
+	write = function(value: Vector2)
+		alloc(8)
+		f32(value.X)
+		f32(value.Y)
 	end,
 }
 

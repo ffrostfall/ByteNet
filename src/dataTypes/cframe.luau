@@ -2,6 +2,7 @@ local bufferWriter = require(script.Parent.Parent.process.bufferWriter)
 local types = require(script.Parent.Parent.types)
 
 local f32 = bufferWriter.f32
+local alloc = bufferWriter.alloc
 
 -- thanks jack :p
 local cframe = {
@@ -19,7 +20,7 @@ local cframe = {
 
 		return CFrame.fromAxisAngle(axis, angle) + Vector3.new(x, y, z), 24
 	end,
-	write = function(cursor: number, value: CFrame)
+	write = function(value: CFrame)
 		-- Convert the CFrame to an axis-angle representation
 		local x, y, z = value.X, value.Y, value.Z
 
@@ -28,14 +29,13 @@ local cframe = {
 		axis = axis * angle
 
 		-- Math done, write it now
-		f32(cursor, x)
-		f32(cursor + 4, y)
-		f32(cursor + 8, z)
-		f32(cursor + 12, rx)
-		f32(cursor + 16, ry)
-		f32(cursor + 20, rz)
-
-		return 24
+		alloc(24)
+		f32(x)
+		f32(y)
+		f32(z)
+		f32(rx)
+		f32(ry)
+		f32(rz)
 	end,
 }
 

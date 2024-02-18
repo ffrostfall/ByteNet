@@ -3,6 +3,7 @@ local types = require(script.Parent.Parent.types)
 
 local u16 = bufferWriter.u16
 local writestring = bufferWriter.writestring
+local dyn_alloc = bufferWriter.dyn_alloc
 
 local str = {
 	-- 2 bytes for the length, then the string
@@ -12,13 +13,12 @@ local str = {
 
 		return buffer.readstring(b, cursor + 2, length), length + 2
 	end,
-	write = function(cursor: number, data: string)
+	write = function(data: string)
 		local length = string.len(data)
+		dyn_alloc(length + 2)
 
-		u16(cursor, length)
-		writestring(cursor + 2, data)
-
-		return length + 2
+		u16(length)
+		writestring(data)
 	end,
 }
 

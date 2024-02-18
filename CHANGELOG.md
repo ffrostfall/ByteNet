@@ -4,10 +4,23 @@ This project uses [semantic versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
+## version 0.3.1
+
+### Improvements
+- Rewrote serialization to use an allocator w/ resizing instead of using "deferred write" functions. Should be an incredibly large performance boost.
+
+---
+
 ## version 0.3.0
+
+### Added
+- Types: Vector2, CFrame, Array, Optional, Map
 
 ### Improvements
 - Rewrote client/server processing. Should drastically improve stability and performance.
+- Completely re-did how serialization happens to be a lot more stable, and to allow a lot of room for improvement.
+- Many type improvements
+- Removed only dependency
 
 ---
 
