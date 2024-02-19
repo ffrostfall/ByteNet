@@ -3,16 +3,6 @@
 registry = "test"
 
 [[package]]
-name = "ffrostflame/bytenet"
-version = "0.3.0-dev"
-dependencies = [["TableKit", "ffrostflame/tablekit@0.2.4"], ["wallyInstanceManager", "ffrostflame/wally-instance-manager@0.1.0"]]
-
-[[package]]
-name = "ffrostflame/tablekit"
-version = "0.2.4"
-dependencies = []
-
-[[package]]
-name = "ffrostflame/wally-instance-manager"
-version = "0.1.0"
+name = "canary-development/bytenetbackend"
+version = "1.0.0"
 dependencies = []
