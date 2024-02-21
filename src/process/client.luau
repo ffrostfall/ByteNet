@@ -5,6 +5,9 @@ local types = require(script.Parent.Parent.types)
 local read = require(script.Parent.read)
 local bufferWriter = require(script.Parent.bufferWriter)
 
+local alloc = bufferWriter.alloc
+local u8 = bufferWriter.u8
+
 local function onClientEvent(receivedBuffer)
 	read(receivedBuffer)
 end
@@ -17,21 +20,14 @@ local EMPTY: types.channelData = {
 }
 
 local function load(freshChannel: types.channelData?)
-	if not freshChannel then
-		local newChannel = table.clone(EMPTY)
-		newChannel.buff = buffer.create(64)
-		bufferWriter.load(newChannel)
+	if freshChannel then
+		bufferWriter.load(freshChannel)
 		return
 	end
 
-	bufferWriter.load(freshChannel)
-end
-
-local function addPacketToLoadedChannel(format: types.packetFormat, data: { [string]: any })
-	for _, value in format do
-		-- value[2] is the write function, value[3] is the key
-		(value[2] :: (cursor: number, value: any) -> number)(data[value[3] :: string])
-	end
+	local newChannel = table.clone(EMPTY)
+	newChannel.buff = buffer.create(64)
+	bufferWriter.load(newChannel)
 end
 
 local function dump(channel: types.channelData): buffer
@@ -46,20 +42,22 @@ local unreliable: types.channelData? = nil
 
 local clientProcess = {}
 
-function clientProcess.sendReliable(id: number, format: types.packetFormat, data: { [string]: any })
+function clientProcess.sendReliable(id: number, writer: (value: any) -> (), data: { [string]: any })
 	reliable = load(reliable)
 
-	bufferWriter.u8(id)
-	addPacketToLoadedChannel(format, data)
+	alloc(1)
+	u8(id)
+	writer(data)
 
 	reliable = bufferWriter.export()
 end
 
-function clientProcess.sendUnreliable(id: number, format: types.packetFormat, data: { [string]: any })
+function clientProcess.sendUnreliable(id: number, writer: (value: any) -> (), data: { [string]: any })
 	unreliable = load(unreliable)
 
-	bufferWriter.u8(id)
-	addPacketToLoadedChannel(format, data)
+	alloc(1)
+	u8(id)
+	writer(data)
 
 	unreliable = bufferWriter.export()
 end

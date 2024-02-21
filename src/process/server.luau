@@ -8,7 +8,8 @@ local types = require(script.Parent.Parent.types)
 local read = require(script.Parent.read)
 local bufferWriter = require(script.Parent.bufferWriter)
 
-
+local alloc = bufferWriter.alloc
+local u8 = bufferWriter.u8
 
 -- All channelData is set to nil upon being sent which is why these are all optionals
 local globalReliable: types.channelData? = nil
@@ -24,26 +25,22 @@ local EMPTY: types.channelData = {
 }
 
 local function load(freshChannel: types.channelData?)
-	if not freshChannel then
-		local newChannel = table.clone(EMPTY)
-		newChannel.buff = buffer.create(64)
-		bufferWriter.load(newChannel)
+	if freshChannel then
+		bufferWriter.load(freshChannel)
 		return
 	end
 
-	bufferWriter.load(freshChannel)
-end
-
-local function addPacketToLoadedChannel(format: types.packetFormat, data: { [string]: any })
-	for _, value in format do
-		-- value[2] is the write function, value[3] is the key
-		(value[2] :: (cursor: number, value: any) -> number)(data[value[3] :: string])
-	end
+	local newChannel = table.clone(EMPTY)
+	newChannel.buff = buffer.create(64)
+	bufferWriter.load(newChannel)
 end
 
 local function dump(channel: types.channelData): buffer
-	local dumpBuffer = buffer.create(channel.cursor)
-	buffer.copy(dumpBuffer, 0, channel.buff, 0, channel.cursor)
+	local cursor = channel.cursor
+	local dumpBuffer = buffer.create(cursor)
+
+	buffer.copy(dumpBuffer, 0, channel.buff, 0, cursor)
+
 	return dumpBuffer
 end
 -- No longer shared
@@ -55,31 +52,27 @@ local function onServerEvent(player: Player, data)
 		return
 	end
 
-	-- Limit the amount of data
-	if buffer.len(data) >= 100000 then
-		warn("over 100K byte limit from player: " .. player.UserId)
-		return
-	end
-
 	read(data, player)
 end
 
 local serverProcess = {}
 
-function serverProcess.sendAllReliable(id: number, format: types.packetFormat, data: { [string]: any })
+function serverProcess.sendAllReliable(id: number, writer: (value: any) -> (), data: { [string]: any })
 	load(globalReliable)
 
-	bufferWriter.u8(id)
-	addPacketToLoadedChannel(format, data)
+	alloc(1)
+	u8(id)
+	writer(data)
 
 	globalReliable = bufferWriter.export()
 end
 
-function serverProcess.sendAllUnreliable(id: number, format: types.packetFormat, data: { [string]: any })
+function serverProcess.sendAllUnreliable(id: number, writer: (value: any) -> (), data: { [string]: any })
 	load(globalUnreliable)
 
-	bufferWriter.u8(id)
-	addPacketToLoadedChannel(format, data)
+	alloc(1)
+	u8(id)
+	writer(data)
 
 	globalUnreliable = bufferWriter.export()
 end
@@ -87,13 +80,14 @@ end
 function serverProcess.sendPlayerReliable(
 	player: Player,
 	id: number,
-	format: types.packetFormat,
+	writer: (value: any) -> (),
 	data: { [string]: any }
 )
 	load(perPlayerReliable[player])
 
-	bufferWriter.u8(id)
-	addPacketToLoadedChannel(format, data)
+	alloc(1)
+	u8(id)
+	writer(data)
 
 	perPlayerReliable[player] = bufferWriter.export()
 end
@@ -101,13 +95,14 @@ end
 function serverProcess.sendPlayerUnreliable(
 	player: Player,
 	id: number,
-	format: types.packetFormat,
+	writer: (value: any) -> (),
 	data: { [string]: any }
 )
 	load(perPlayerUnreliable[player])
 
-	bufferWriter.u8(id)
-	addPacketToLoadedChannel(format, data)
+	alloc(1)
+	u8(id)
+	writer(data)
 
 	perPlayerUnreliable[player] = bufferWriter.export()
 end

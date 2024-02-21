@@ -1,3 +1,4 @@
+--!strict
 --!native
 --!optimize 2
 local Players = game:GetService("Players")
@@ -6,7 +7,7 @@ local RunService = game:GetService("RunService")
 
 local testPackets = require(ReplicatedStorage.shared.testPackets)
 
-local data = {
+--[[local data = {
 	a = false,
 	b = { true, false, false },
 	c = { { false }, { true } },
@@ -15,31 +16,39 @@ local data = {
 	f = {
 		[Vector3.new(15, 15, 15)] = 2554,
 	},
-}
+}]]
+
+local out = {}
+for _ = 1, 1000 do
+	table.insert(out, {
+		a = 5,
+		b = 4,
+		c = "",
+		d = 2,
+	})
+end
 
 RunService.Heartbeat:Connect(function()
+	--[[[for _ = 1, 100 do
+		ReplicatedStorage.RemoteEvent:FireAllClients(data)
+	end]]
+
 	debug.profilebegin("send")
 	for _ = 1, 100 do
-		testPackets.a:sendToAll(data)
+		--ReplicatedStorage.RemoteEvent:FireAllClients(out)
+		testPackets.myPacket.sendToAll(out)
 	end
 	debug.profileend()
 end)
 
 Players.PlayerAdded:Connect(function()
 	task.wait(1)
-	testPackets.a:sendToAll({
-		a = false,
-		b = { true, false, false },
-		c = { { false }, { true } },
-		d = nil,
-		e = { [8] = 4 },
-		f = {
-			[Vector3.new(15, 15, 15)] = 2554,
-		},
-	})
+	--[[testPackets.myPacket:sendToAll({ {
+		myMessage = "",
+	} })]]
 end)
 
-testPackets.a:listen(function(a)
+testPackets.myPacket.listen(function(a)
 	print("Confirming client -> server")
 	print(a)
 end)

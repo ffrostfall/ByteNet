@@ -7,36 +7,33 @@ local alloc = bufferWriter.alloc
 --[[
 	Create a new array with the given dataTypeInterface
 ]]
-return function(
-		valueType: types.dataTypeInterface<
-			any
-		>
-	)
-		local valueWrite = valueType.write
+return function(valueType: types.dataTypeInterface<any>)
+	local valueWrite = valueType.write
+	local valueRead = valueType.read
 
-		return {
-			read = function(b: buffer, cursor: number)
-				local arrayLength = buffer.readu16(b, cursor)
-				local arrayCursor = cursor + 2
-				local array = {}
+	return {
+		read = function(b: buffer, cursor: number)
+			local arrayLength = buffer.readu16(b, cursor)
+			local arrayCursor = cursor + 2
+			local array = {}
 
-				for _ = 1, arrayLength do
-					local item, length = valueType.read(b, arrayCursor)
-					table.insert(array, item)
+			for _ = 1, arrayLength do
+				local item, length = valueRead(b, arrayCursor)
+				table.insert(array, item)
 
-					arrayCursor += length
-				end
+				arrayCursor += length
+			end
 
-				return array, (arrayCursor - cursor)
-			end,
-			write = function(value: any)
-				alloc(2)
-				u16(#value) -- write length, 2 bytes
+			return array, arrayCursor - cursor
+		end,
+		write = function(value: any)
+			alloc(2)
+			u16(#value) -- write length, 2 bytes
 
-				for _, item in value do
-					-- add the length of the item to the cursor
-					valueWrite(item)
-				end
-			end,
-		}
-	end :: <T>(valueType: types.dataTypeInterface<T>) -> types.dataTypeInterface<{ [number]: T }>
+			for _, item in value do
+				-- add the length of the item to the cursor
+				valueWrite(item)
+			end
+		end,
+	}
+end

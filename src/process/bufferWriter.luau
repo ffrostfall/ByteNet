@@ -24,20 +24,22 @@ local cursor: number
 local buff: buffer
 
 local function alloc(bytes: number)
-	if cursor + bytes >= size then
-		size = math.floor((size * 1.5))
-
-		local newBuffer = buffer.create(size)
-		buffer.copy(newBuffer, 0, buff)
-
-		buff = newBuffer
+	if not (cursor + bytes >= size) then
+		return
 	end
+
+	size = math.floor(size * 1.5)
+
+	local newBuffer = buffer.create(size)
+	buffer.copy(newBuffer, 0, buff)
+
+	buff = newBuffer
 end
 
 local function dyn_alloc(bytes: number)
 	if cursor + bytes >= size then
 		while cursor + bytes >= size do
-			size = math.floor((size * 1.5))
+			size = math.floor(size * 1.5)
 		end
 
 		local newBuffer = buffer.create(size)
@@ -113,10 +115,12 @@ function bufferWriter.bfalse()
 end
 
 function bufferWriter.load(channel: types.channelData)
-	current = channel
-	size = channel.size
-	cursor = channel.cursor
-	buff = channel.buff
+	if current ~= channel then
+		current = channel
+		size = channel.size
+		cursor = channel.cursor
+		buff = channel.buff
+	end
 end
 
 function bufferWriter.export()

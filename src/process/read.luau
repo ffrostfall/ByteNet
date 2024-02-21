@@ -1,13 +1,30 @@
-local RunService = game:GetService("RunService")
+local packetIDs = require(script.Parent.Parent.namespaces.packetIDs)
 
-local clientPacketIDs = require(script.Parent.Parent.packets.clientPacketIDs)
-local serverPacketIDs = require(script.Parent.Parent.packets.serverPacketIDs)
-local types = require(script.Parent.Parent.types)
+local freeThread: thread?
 
--- Shorthand to avoid having to check if we're on the server or client every time
-local retrievePacketFromID = (
-	if RunService:IsServer() then serverPacketIDs.getPacketFromID else clientPacketIDs.getPacketFromID
-) :: (packetID: number) -> any
+local function functionPasser(fn, ...)
+	local aquiredThread = freeThread
+	freeThread = nil
+	fn(...)
+	freeThread = aquiredThread
+end
+
+local function yielder()
+	while true do
+		functionPasser(coroutine.yield())
+	end
+end
+
+local function runListener(fn, ...)
+	if freeThread == nil then
+		freeThread = coroutine.create(yielder)
+		coroutine.resume(freeThread :: thread)
+	end
+
+	task.spawn(freeThread :: thread, fn, ...)
+end
+
+local packetIDCache = {}
 
 return function(incomingBuffer: buffer, player: Player?)
 	local length = buffer.len(incomingBuffer)
@@ -19,25 +36,25 @@ return function(incomingBuffer: buffer, player: Player?)
 		readCursor += 1
 
 		-- Get packet class, then get packet format
-		local packet = retrievePacketFromID(id)
-		local format = packet.packetFormat :: types.packetFormat
+		if packetIDCache[id] then
+			local value, valueLength = packetIDCache[id].reader(incomingBuffer, readCursor)
 
-		local deserialized = {}
-		for _, item in format do
-			-- item[1] is the reader function for the value type
-			-- it'll return the value and the length of the value
-			local value, itemLength = ((item[1] :: any) :: (b: buffer, cursor: number) -> (any, number))(
-				incomingBuffer,
-				readCursor
-			)
-			readCursor += itemLength
+			readCursor += valueLength
 
-			-- item[3] is the key, so we're converting it into something usable here
-			deserialized[item[3]] = value
-		end
+			for _, listener in packetIDCache[id].getListeners() do
+				runListener(listener, value, player)
+			end
+		else
+			local packet = packetIDs.get(id)
+			packetIDCache[id] = packet
 
-		for _, listener in packet.listeners do
-			task.spawn(listener, deserialized, player)
+			local value, valueLength = packet.reader(incomingBuffer, readCursor)
+
+			readCursor += valueLength
+
+			for _, listener in packet.getListeners() do
+				runListener(listener, value, player)
+			end
 		end
 	end
 end

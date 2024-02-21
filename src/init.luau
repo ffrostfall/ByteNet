@@ -1,8 +1,5 @@
 local RunService = game:GetService("RunService")
 
-local clientPacketIDs = require(script.packets.clientPacketIDs)
-local serverPacketIDs = require(script.packets.serverPacketIDs)
-local packet = require(script.packets.packet)
 local clientProcess = require(script.process.client)
 local array = require(script.dataTypes.array)
 local bool = require(script.dataTypes.bool)
@@ -16,25 +13,30 @@ local int8 = require(script.dataTypes.int8)
 local map = require(script.dataTypes.map)
 local optional = require(script.dataTypes.optional)
 local string = require(script.dataTypes.string)
+local struct = require(script.dataTypes.struct)
 local uint16 = require(script.dataTypes.uint16)
 local uint32 = require(script.dataTypes.uint32)
 local uint8 = require(script.dataTypes.uint8)
 local vec2 = require(script.dataTypes.vec2)
 local vec3 = require(script.dataTypes.vec3)
+local namespace = require(script.namespaces.namespace)
+local definePacket = require(script.packets.definePacket)
 local serverProcess = require(script.process.server)
+local values = require(script.replicated.values)
 local types = require(script.types)
+
+values.start()
 
 if RunService:IsServer() then
 	serverProcess.start()
-	serverPacketIDs.start()
 else
 	clientProcess.start()
-	clientPacketIDs.start()
 end
 
 return (
 	table.freeze({
-		definePacket = packet,
+		definePacket = definePacket,
+		defineNamespace = namespace,
 
 		array = array,
 		bool = bool(),
@@ -52,6 +54,7 @@ return (
 		vec2 = vec2(),
 		vec3 = vec3(),
 		buff = buff(),
+		struct = struct,
 		map = map,
 	}) :: any
 ) :: types.ByteNet

@@ -4,6 +4,20 @@ This project uses [semantic versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
+## version 0.4.0
+
+### Added
+- Namespaces have been added.
+- Structs have been added.
+
+### Improvements
+- Packets are now based off closures, instead of metatables. This means you now have to use `.` indexxing instead of `:` to call methods.
+- You can now have duplicate packet contents
+- Packets now take a single value (Which can be a struct) instead of being "special".
+- Significant optimization
+
+---
+
 ## version 0.3.1
 
 ### Improvements
