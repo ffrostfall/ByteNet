@@ -1,3 +1,6 @@
+--[[
+	Exists solely to get a packet instance from an ID in the reader file
+]]
 local dict = {}
 
 local packetIDs = {}

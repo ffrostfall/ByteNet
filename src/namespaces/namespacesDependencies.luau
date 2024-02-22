@@ -1,3 +1,7 @@
+--[[
+	Basic dependency graph for structs created within a namespace
+]]
+
 local current: { [number]: any }?
 local currentName: string
 

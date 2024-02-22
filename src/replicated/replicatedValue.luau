@@ -17,6 +17,8 @@ function replicatedValuePrototype.write(self: replicatedValueType, value: {})
 	assert(runContext == "server", "cannot write to replicatdvalue on client")
 
 	self._luauData = value
+
+	-- self._value.Value :(
 	self._value.Value = HttpService:JSONEncode(value)
 end
 

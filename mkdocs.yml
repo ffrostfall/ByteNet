@@ -38,6 +38,7 @@ theme:
 extra_css:
   - assets/colors.css
   - assets/home.css
+  - css/colors.css
 
 markdown_extensions:
   - pymdownx.highlight:

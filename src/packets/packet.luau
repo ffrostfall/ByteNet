@@ -10,6 +10,10 @@ local server = require(script.Parent.Parent.process.server)
 
 local moduleRunContext: "server" | "client" = if RunService:IsServer() then "server" else "client"
 
+--[[
+	We use closures here instead of metatables for performance
+	It's just faster to use closures than metatables
+]]
 return function(props: types.packetProps<types.dataTypeInterface<any>>, id: number)
 	-- Basic properties: reliability type, "unique" which is used to get the packet ID, and set up listeners
 	local reliabilityType = props.reliabilityType or "reliable"
@@ -30,37 +34,48 @@ return function(props: types.packetProps<types.dataTypeInterface<any>>, id: numb
 		then client.sendReliable
 		else client.sendUnreliable
 
+	-- shorcut to avoid indexxing
 	local writer = props.value.write
 
 	local exported = {}
+
+	-- RunContext error checking that doesn't have performance drawbacks
+	setmetatable(exported, {
+		__index = function(index)
+			if
+				(index == "sendTo" or index == "sendToAllExcept" or index == "sendToAll")
+				and moduleRunContext == "client"
+			then
+				error("You cannot use sendTo, sendToAllExcept, or sendToAll on the client")
+			elseif index == "send" and moduleRunContext == "server" then
+				error("You cannot use send on the server")
+			end
+		end,
+	})
+
+	-- exposed for the reader file
 	exported.reader = props.value.read
 
-	function exported.sendTo(data, player: Player)
-		assert(moduleRunContext == "server", "The 'sendTo' method can only be called on the server")
+	if moduleRunContext == "server" then
+		function exported.sendTo(data, player: Player)
+			serverSendFunction(player, id, writer, data)
+		end
 
-		serverSendFunction(player, id, writer, data)
-	end
-
-	function exported.sendToAllExcept(data, except: Player)
-		assert(moduleRunContext == "server", "The 'sendToAllExcept' method can only be called on the server")
-
-		for _, player: Player in Players:GetPlayers() do
-			if player ~= except then
-				serverSendFunction(player, id, writer, data)
+		function exported.sendToAllExcept(data, except: Player)
+			for _, player: Player in Players:GetPlayers() do
+				if player ~= except then
+					serverSendFunction(player, id, writer, data)
+				end
 			end
 		end
-	end
 
-	function exported.sendToAll(data)
-		assert(moduleRunContext == "server", "The 'sendToAll' method can only be called on the server")
-
-		serverSendAllFunction(id, writer, data)
-	end
-
-	function exported.send(data)
-		assert(moduleRunContext == "client", "The 'send' method can only be called on the client")
-
-		clientSendFunction(id, writer, data)
+		function exported.sendToAll(data)
+			serverSendAllFunction(id, writer, data)
+		end
+	elseif moduleRunContext == "client" then
+		function exported.send(data)
+			clientSendFunction(id, writer, data)
+		end
 	end
 
 	function exported.listen(callback)

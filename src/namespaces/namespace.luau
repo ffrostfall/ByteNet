@@ -45,6 +45,8 @@ return function(
 
 		namespaceReplicator:write(constructedNamespace)
 	elseif runContext == "client" then
+		-- yes, this means that packets technically don't need to be defined on the client
+		-- we do it anyway for typechecking and perf shortcuts
 		local namespaceData = namespaceReplicator:read() :: types.namespaceData
 
 		for key, packet in packets do
