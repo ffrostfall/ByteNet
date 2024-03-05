@@ -26,7 +26,7 @@ end
 
 local packetIDCache = {}
 
-return function(incomingBuffer: buffer, player: Player?)
+return function(incomingBuffer: buffer, references: { [number]: unknown }?, player: Player?)
 	local length = buffer.len(incomingBuffer)
 	local readCursor = 0
 
@@ -37,7 +37,7 @@ return function(incomingBuffer: buffer, player: Player?)
 
 		-- Get packet class, then get packet format
 		if packetIDCache[id] then
-			local value, valueLength = packetIDCache[id].reader(incomingBuffer, readCursor)
+			local value, valueLength = packetIDCache[id].reader(incomingBuffer, readCursor, references)
 
 			readCursor += valueLength
 
@@ -48,7 +48,7 @@ return function(incomingBuffer: buffer, player: Player?)
 			local packet = packetIDs.get(id)
 			packetIDCache[id] = packet
 
-			local value, valueLength = packet.reader(incomingBuffer, readCursor)
+			local value, valueLength = packet.reader(incomingBuffer, readCursor, references)
 
 			readCursor += valueLength
 

@@ -20,8 +20,9 @@ local perPlayerUnreliable: { [Player]: types.channelData? } = {}
 -- Shared with: src/process/client.luau (Infeasible to split this into another file)
 local EMPTY: types.channelData = {
 	cursor = 0,
-	size = 64,
-	buff = nil :: any,
+	size = 256,
+	references = {},
+	buff = false :: any,
 }
 
 local function load(freshChannel: types.channelData?)
@@ -31,7 +32,7 @@ local function load(freshChannel: types.channelData?)
 	end
 
 	local newChannel = table.clone(EMPTY)
-	newChannel.buff = buffer.create(64)
+	newChannel.buff = buffer.create(256)
 	bufferWriter.load(newChannel)
 end
 
@@ -41,18 +42,18 @@ local function dump(channel: types.channelData): buffer
 
 	buffer.copy(dumpBuffer, 0, channel.buff, 0, cursor)
 
-	return dumpBuffer
+	return dumpBuffer, channel.references
 end
 -- No longer shared
 
 -- TODO handle invalid data better
-local function onServerEvent(player: Player, data)
+local function onServerEvent(player: Player, data, references)
 	-- Only accept buffer data
 	if not (typeof(data) == "buffer") then
 		return
 	end
 
-	read(data, player)
+	read(data, references, player)
 end
 
 local serverProcess = {}
@@ -117,6 +118,10 @@ function serverProcess.start()
 	unreliableRemote.Name = "ByteNetUnreliable"
 	unreliableRemote.OnServerEvent:Connect(onServerEvent)
 	unreliableRemote.Parent = ReplicatedStorage
+
+	local metaRemote = Instance.new("RemoteEvent")
+	metaRemote.Name = "ByteNetMeta"
+	metaRemote.Parent = ReplicatedStorage
 
 	RunService.Heartbeat:Connect(function()
 		-- Check if the channel has anything before trying to send it

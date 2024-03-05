@@ -1,31 +1,36 @@
-# ByteNet
+# ByteNet Changelog
 
-This project uses [semantic versioning](https://semver.org/spec/v2.0.0.html).
+ByteNet uses [semantic versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
-## version 0.4.0
+## 0.4.0-rc3
 
 ### Added
 - Namespaces have been added.
 - Structs have been added.
+- Three new data types: Instance, unknown, and nothing. The "nothing" type is to allow for packets without any contents.
+- Added `:wait()` to packets.
 
 ### Improvements
 - Packets are now based off closures, instead of metatables. This means you now have to use `.` indexxing instead of `:` to call methods.
 - You can now have duplicate packet contents
 - Packets now take a single value (Which can be a struct) instead of being "special".
-- Significant optimization
+- Significant optimization: Packets are now singular values that can be structs, which reduces complexity, thus increasing performance.
+
+### Fixes
+- Added `:sendTo()` to the `Packet` type. This fixes autocomplete.
 
 ---
 
-## version 0.3.1
+## 0.3.1
 
 ### Improvements
 - Rewrote serialization to use an allocator w/ resizing instead of using "deferred write" functions. Should be an incredibly large performance boost.
 
 ---
 
-## version 0.3.0
+## 0.3.0
 
 ### Added
 - Types: Vector2, CFrame, Array, Optional, Map
@@ -38,7 +43,7 @@ This project uses [semantic versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
-## version 0.2.1
+## 0.2.1
 
 ### Fixes
 
@@ -46,7 +51,7 @@ This project uses [semantic versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
-## version 0.2.0
+## 0.2.0
 
 ### Added
 
@@ -65,7 +70,7 @@ This project uses [semantic versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
-## version 0.1.3
+## 0.1.3
 
 ### Fixes
 
@@ -73,7 +78,7 @@ This project uses [semantic versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
-## version 0.1.2
+## 0.1.2
 
 ### Fixes
 
@@ -82,7 +87,7 @@ This project uses [semantic versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
-## version 0.1.1
+## 0.1.1
 
 ### Improvements
 
@@ -95,4 +100,4 @@ This project uses [semantic versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
-## version 0.1.0 (Release)
+## 0.1.0 (Release)

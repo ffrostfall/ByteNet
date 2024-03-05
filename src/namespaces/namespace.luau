@@ -1,3 +1,10 @@
+--[[
+	The file that contains the function for handling and creating namespaces.
+	Namespaces aren't really anything special, they are just an encapsulation to make it easier to manage packets and structs.
+	
+	Dependency management is fun!
+]]
+
 local RunService = game:GetService("RunService")
 
 local values = require(script.Parent.Parent.replicated.values)

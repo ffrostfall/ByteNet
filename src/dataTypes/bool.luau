@@ -15,6 +15,7 @@ local bool = {
 	read = function(b: buffer, cursor: number)
 		return buffer.readu8(b, cursor) == 1, 1
 	end,
+
 	write = function(value: boolean)
 		alloc(1)
 

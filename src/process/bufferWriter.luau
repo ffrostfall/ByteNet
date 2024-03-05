@@ -22,6 +22,7 @@ local current: types.channelData
 local size: number
 local cursor: number
 local buff: buffer
+local references: { [number]: unknown }
 
 local function alloc(bytes: number)
 	if not (cursor + bytes >= size) then
@@ -61,6 +62,15 @@ end
 
 function bufferWriter.i8(value: number)
 	buffer.writei8(buff, cursor, value)
+	cursor += 1
+end
+
+-- this exists solely for the unknown and instance data type. Will likely be obselete soon enough
+function bufferWriter.reference(value: any)
+	table.insert(references, value)
+	local index = #references
+
+	buffer.writeu8(buff, cursor, index)
 	cursor += 1
 end
 
@@ -119,6 +129,7 @@ function bufferWriter.load(channel: types.channelData)
 		current = channel
 		size = channel.size
 		cursor = channel.cursor
+		references = channel.references
 		buff = channel.buff
 	end
 end

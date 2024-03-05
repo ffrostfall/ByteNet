@@ -57,6 +57,12 @@ return function(props: types.packetProps<types.dataTypeInterface<any>>, id: numb
 	exported.reader = props.value.read
 
 	if moduleRunContext == "server" then
+		function exported.sendToPlayers(data, players: { Player })
+			for _, player in players do
+				serverSendFunction(player, id, writer, data)
+			end
+		end
+
 		function exported.sendTo(data, player: Player)
 			serverSendFunction(player, id, writer, data)
 		end
@@ -76,6 +82,25 @@ return function(props: types.packetProps<types.dataTypeInterface<any>>, id: numb
 		function exported.send(data)
 			clientSendFunction(id, writer, data)
 		end
+	end
+
+	function exported.wait()
+		-- define it up here so we can use it to disconnect
+		local index: number
+
+		local runningThread = coroutine.running()
+		table.insert(listeners, function(data, player)
+			task.spawn(runningThread, data, player)
+
+			-- Disconnects the listener
+			table.remove(listeners, index)
+		end)
+
+		-- we connected, time to set the index for when we need to disconnect.
+		index = #listeners
+
+		-- the listener will resume the thread
+		return coroutine.yield()
 	end
 
 	function exported.listen(callback)

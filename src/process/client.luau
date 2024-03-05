@@ -15,8 +15,9 @@ end
 -- Shared with: src/process/server.luau (Infeasible to split this into another file)
 local EMPTY: types.channelData = {
 	cursor = 0,
-	size = 64,
+	size = 128,
 	buff = nil :: any,
+	references = {},
 }
 
 local function load(freshChannel: types.channelData?)
@@ -26,14 +27,16 @@ local function load(freshChannel: types.channelData?)
 	end
 
 	local newChannel = table.clone(EMPTY)
-	newChannel.buff = buffer.create(64)
+	newChannel.buff = buffer.create(128)
 	bufferWriter.load(newChannel)
 end
 
 local function dump(channel: types.channelData): buffer
 	local dumpBuffer = buffer.create(channel.cursor)
+
 	buffer.copy(dumpBuffer, 0, channel.buff, 0, channel.cursor)
-	return dumpBuffer
+
+	return dumpBuffer, channel.references
 end
 -- No longer shared
 
