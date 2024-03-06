@@ -43,9 +43,9 @@ end)
 
 Players.PlayerAdded:Connect(function()
 	task.wait(1)
-	--[[testPackets.myPacket:sendToAll({ {
+	testPackets.myPacket.sendToAll({
 		myMessage = "",
-	} })]]
+	})
 end)
 
 testPackets.myPacket.listen(function(a)
