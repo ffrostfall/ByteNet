@@ -21,7 +21,7 @@ theme:
     primary: custom
     accent: white
   font:
-    text: Roboto
+    text: Arial
     code: Fira Code
   features:
     - content.code.copy
@@ -36,9 +36,10 @@ theme:
     repo: octicons/mark-github-16
 
 extra_css:
-  - assets/colors.css
-  - assets/home.css
   - css/colors.css
+  - css/codeblocks.css
+  - css/global.css
+  - css/homepage.css
 
 markdown_extensions:
   - pymdownx.highlight:

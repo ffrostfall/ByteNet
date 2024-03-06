@@ -8,6 +8,7 @@ local alloc = bufferWriter.alloc
 return function(valueType: types.dataTypeInterface<
 		any
 	>)
+		local valueRead = valueType.read
 		local valueWrite = valueType.write
 
 		return {
@@ -17,29 +18,25 @@ return function(valueType: types.dataTypeInterface<
 		]]
 
 			read = function(b: buffer, cursor: number)
-				local exists = buffer.readu8(b, cursor)
-
-				if exists == 0 then
+				if buffer.readu8(b, cursor) == 0 then
 					-- doesn't exist
 					return nil, 1
 				else
 					-- exists, read the value
-					local item, length = valueType.read(b, cursor + 1)
+					local item, length = valueRead(b, cursor + 1)
 					return item, length + 1
 				end
 			end,
+
 			write = function(value: any)
 				alloc(1)
+
 				if value == nil then
-					-- preemptively write false
 					bfalse()
 					return
 				end
 
-				-- write true, then the value
 				btrue()
-
-				-- write the value
 				valueWrite(value)
 			end,
 		}

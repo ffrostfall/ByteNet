@@ -7,41 +7,34 @@ local bufferWriter = require(script.Parent.bufferWriter)
 
 local alloc = bufferWriter.alloc
 local u8 = bufferWriter.u8
+local load = bufferWriter.load
 
 local function onClientEvent(receivedBuffer)
 	read(receivedBuffer)
 end
 
 -- Shared with: src/process/server.luau (Infeasible to split this into another file)
-local EMPTY: types.channelData = {
-	cursor = 0,
-	size = 128,
-	buff = nil :: any,
-	references = {},
-}
-
-local function load(freshChannel: types.channelData?)
-	if freshChannel then
-		bufferWriter.load(freshChannel)
-		return
-	end
-
-	local newChannel = table.clone(EMPTY)
-	newChannel.buff = buffer.create(128)
-	bufferWriter.load(newChannel)
+local function create()
+	return {
+		cursor = 0,
+		size = 256,
+		references = {},
+		buff = buffer.create(256),
+	}
 end
 
 local function dump(channel: types.channelData): buffer
-	local dumpBuffer = buffer.create(channel.cursor)
+	local cursor = channel.cursor
+	local dumpBuffer = buffer.create(cursor)
 
-	buffer.copy(dumpBuffer, 0, channel.buff, 0, channel.cursor)
+	buffer.copy(dumpBuffer, 0, channel.buff, 0, cursor)
 
 	return dumpBuffer, channel.references
 end
 -- No longer shared
 
-local reliable: types.channelData? = nil
-local unreliable: types.channelData? = nil
+local reliable: types.channelData = create()
+local unreliable: types.channelData = create()
 
 local clientProcess = {}
 
@@ -78,13 +71,13 @@ function clientProcess.start()
 			reliableRemote:FireServer(dump(reliable))
 
 			-- effectively clears the channel
-			reliable = nil
+			reliable.cursor = 0
 		end
 
 		if unreliable ~= nil then
 			unreliableRemote:FireServer(dump(unreliable))
 
-			unreliable = nil
+			unreliable.cursor = 0
 		end
 	end)
 end

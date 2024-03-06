@@ -10,41 +10,34 @@ local bufferWriter = require(script.Parent.bufferWriter)
 
 local alloc = bufferWriter.alloc
 local u8 = bufferWriter.u8
+local load = bufferWriter.load
 
 -- All channelData is set to nil upon being sent which is why these are all optionals
-local globalReliable: types.channelData? = nil
-local globalUnreliable: types.channelData? = nil
-local perPlayerReliable: { [Player]: types.channelData? } = {}
-local perPlayerUnreliable: { [Player]: types.channelData? } = {}
+local perPlayerReliable: { [Player]: types.channelData } = {}
+local perPlayerUnreliable: { [Player]: types.channelData } = {}
 
 -- Shared with: src/process/client.luau (Infeasible to split this into another file)
-local EMPTY: types.channelData = {
-	cursor = 0,
-	size = 256,
-	references = {},
-	buff = false :: any,
-}
-
-local function load(freshChannel: types.channelData?)
-	if freshChannel then
-		bufferWriter.load(freshChannel)
-		return
-	end
-
-	local newChannel = table.clone(EMPTY)
-	newChannel.buff = buffer.create(256)
-	bufferWriter.load(newChannel)
+local function create()
+	return {
+		cursor = 0,
+		size = 256,
+		references = {},
+		buff = buffer.create(256),
+	}
 end
 
-local function dump(channel: types.channelData): buffer
+local function dump(channel: types.channelData): (buffer, { unknown })
 	local cursor = channel.cursor
 	local dumpBuffer = buffer.create(cursor)
 
-	buffer.copy(dumpBuffer, 0, channel.buff, 0, cursor)
+	buffer.copy(dumpBuffer, 0, channel.buff, 0,   cursor)
 
 	return dumpBuffer, channel.references
 end
 -- No longer shared
+
+local globalReliable: types.channelData = create()
+local globalUnreliable: types.channelData = create()
 
 -- TODO handle invalid data better
 local function onServerEvent(player: Player, data, references)
@@ -109,46 +102,50 @@ function serverProcess.sendPlayerUnreliable(
 end
 
 function serverProcess.start()
-	local reliableRemote: RemoteEvent = Instance.new("RemoteEvent")
+	local reliableRemote = Instance.new("RemoteEvent")
 	reliableRemote.Name = "ByteNetReliable"
 	reliableRemote.OnServerEvent:Connect(onServerEvent)
 	reliableRemote.Parent = ReplicatedStorage
 
-	local unreliableRemote: UnreliableRemoteEvent = Instance.new("UnreliableRemoteEvent")
+	local unreliableRemote = Instance.new("UnreliableRemoteEvent")
 	unreliableRemote.Name = "ByteNetUnreliable"
 	unreliableRemote.OnServerEvent:Connect(onServerEvent)
 	unreliableRemote.Parent = ReplicatedStorage
 
-	local metaRemote = Instance.new("RemoteEvent")
-	metaRemote.Name = "ByteNetMeta"
-	metaRemote.Parent = ReplicatedStorage
+	Players.PlayerAdded:Connect(function(player)
+		perPlayerReliable[player] = create()
+		perPlayerUnreliable[player] = create()
+	end)
 
 	RunService.Heartbeat:Connect(function()
 		-- Check if the channel has anything before trying to send it
-		if globalReliable ~= nil then
+		if globalReliable.cursor > 0 then
 			reliableRemote:FireAllClients(dump(globalReliable))
 
-			-- Clear channel reference
-			globalReliable = nil
+			globalReliable.cursor = 0
+			table.clear(globalReliable.references)
 		end
 
-		if globalUnreliable ~= nil then
+		if globalUnreliable.cursor > 0 then
 			unreliableRemote:FireAllClients(dump(globalUnreliable))
 
-			globalUnreliable = nil
+			globalUnreliable.cursor = 0
+			table.clear(globalUnreliable.references)
 		end
 
 		for _, player in Players:GetPlayers() do
-			if perPlayerReliable[player] ~= nil then
-				reliableRemote:FireClient(player, dump(perPlayerReliable[player] :: types.channelData))
+			if perPlayerReliable[player].cursor > 0 then
+				reliableRemote:FireClient(player, dump(perPlayerReliable[player]))
 
-				perPlayerReliable[player] = nil
+				perPlayerReliable[player].cursor = 0
+				table.clear(perPlayerReliable[player].references)
 			end
 
-			if perPlayerUnreliable[player] ~= nil then
-				unreliableRemote:FireClient(player, dump(perPlayerUnreliable[player] :: types.channelData))
+			if perPlayerUnreliable[player].cursor > 0 then
+				unreliableRemote:FireClient(player, dump(perPlayerUnreliable[player]))
 
-				perPlayerUnreliable[player] = nil
+				perPlayerUnreliable[player].cursor = 0
+				table.clear(perPlayerUnreliable[player].references)
 			end
 		end
 	end)

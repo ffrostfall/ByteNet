@@ -73,7 +73,7 @@ return function(input: {
 
 	return {
 		read = function(b, cursor)
-			local constructed = {}
+			local constructed = table.clone(input)
 			local structCursor = cursor
 
 			for index, valueType in indexValueTypePairs do
@@ -86,6 +86,7 @@ return function(input: {
 
 			return constructed, structCursor - cursor
 		end,
+
 		write = function(structValue)
 			for index, valueType in indexValueTypePairs do
 				valueType.write(structValue[indexKeyPairs[index]])

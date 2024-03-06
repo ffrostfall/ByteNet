@@ -10,11 +10,8 @@ function packetIDs.set(id: number, packet: any)
 	dict[id] = packet
 end
 
-function packetIDs.get(id: number)
-	return dict[id]
-end
-
-function packetIDs.total()
+-- Use this instead of a get function for performance.
+function packetIDs.ref()
 	return dict
 end
 

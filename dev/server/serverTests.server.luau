@@ -19,7 +19,7 @@ local testPackets = require(ReplicatedStorage.shared.testPackets)
 }]]
 
 local out = {}
-for _ = 1, 1000 do
+for _ = 1, 100 do
 	table.insert(out, {
 		a = 5,
 		b = 4,

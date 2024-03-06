@@ -1,0 +1,21 @@
+#nav__link {
+	--md-primary-fg-color: #000000;
+}
+
+.md-header {
+	background-color: #000313;
+}
+.md-tabs {
+	background-color: var(--docs-darkblue);
+}
+.md-ellipsis {
+	color: var(--docs-white);
+}
+
+.md-typeset p {
+	color: var(--docs-white)
+}
+
+body {
+	--md-primary-bg-color: var(--docs-white);
+}
