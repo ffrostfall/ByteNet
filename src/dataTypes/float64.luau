@@ -2,7 +2,7 @@ local bufferWriter = require(script.Parent.Parent.process.bufferWriter)
 local types = require(script.Parent.Parent.types)
 
 local f64 = bufferWriter.f64
-local alloc = bufferWriter.f64
+local alloc = bufferWriter.alloc
 
 local float64 = {
 	write = function(value: number)

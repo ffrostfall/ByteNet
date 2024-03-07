@@ -4,6 +4,18 @@ ByteNet uses [semantic versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
+## 0.4.1
+
+### Improvements
+
+- ByteNet now loops through existing players incase the package was initialized late
+
+### Fixes
+
+- Fixed the float64 data type
+
+---
+
 ## 0.4.0
 
 ### Improvements

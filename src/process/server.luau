@@ -49,6 +49,11 @@ local function onServerEvent(player: Player, data, references)
 	read(data, references, player)
 end
 
+local function playerAdded(player)
+	perPlayerReliable[player] = create()
+	perPlayerUnreliable[player] = create()
+end
+
 local serverProcess = {}
 
 function serverProcess.sendAllReliable(id: number, writer: (value: any) -> (), data: { [string]: any })
@@ -112,10 +117,11 @@ function serverProcess.start()
 	unreliableRemote.OnServerEvent:Connect(onServerEvent)
 	unreliableRemote.Parent = ReplicatedStorage
 
-	Players.PlayerAdded:Connect(function(player)
-		perPlayerReliable[player] = create()
-		perPlayerUnreliable[player] = create()
-	end)
+	for _, player in Players:GetPlayers() do
+		playerAdded(player)
+	end
+
+	Players.PlayerAdded:Connect(playerAdded)
 
 	RunService.Heartbeat:Connect(function()
 		-- Check if the channel has anything before trying to send it
