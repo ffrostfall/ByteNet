@@ -1,0 +1,17 @@
+[data-md-color-scheme="slate"] {
+	--md-code-fg-color:                var(--docs-grey);
+	--md-code-bg-color:                var(--docs-dark);
+	--md-code-hl-color:                var(--docs-pink);
+	--md-code-hl-number-color:         var(--docs-pink);
+	--md-code-hl-special-color:        var(--docs-pink);
+	--md-code-hl-function-color:       var(--docs-pink);
+	--md-code-hl-constant-color:       var(--docs-pastelpink);
+	--md-code-hl-keyword-color:        var(--docs-red);
+	--md-code-hl-string-color:         var(--docs-yellow);
+	--md-code-hl-name-color:           var(--docs-white);
+	--md-code-hl-operator-color:       var(--docs-red);
+	--md-code-hl-punctuation-color:    var(--docs-lightblue);
+	--md-code-hl-comment-color:        var(--docs-green);
+	--md-code-hl-generic-color:        var(--docs-lightblue);
+	--md-code-hl-variable-color:       var(--docs-pastelpink);
+}

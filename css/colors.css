@@ -1,0 +1,15 @@
+:root {
+	--docs-black: #04080f;
+	--docs-dark: rgb(26, 26, 26);
+	--docs-gray: #7a7a7a63;
+	--docs-blue: #456990;
+	--docs-darkblue: #0f0f16;
+	--docs-lightblue: #b9d6f2;
+	--docs-pink: #f4a5ae;
+	--docs-pastelpink: #d999b9;
+	--docs-white: #f5f5f5;
+	--docs-green: #a7ffaa;
+	--docs-yellow: #f5f597;
+	--docs-red: #ff7b7b;
+	--docs-darkred: #310000;
+}

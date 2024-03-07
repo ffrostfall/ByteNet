@@ -13,50 +13,42 @@
 }
 
 [data-md-color-scheme="slate"] {
-	--md-default-bg-color: rgb(10, 10, 10);
+	--md-default-bg-color: var(--docs-black);
 }
 
 #bytenet-header h1 {
 	font-size: 2.5em;
 	font-weight: bolder;
 	margin-bottom: 10px;
-	color: white;
+	color: var(--docs-white);
 }
 
 .docs h1 {
 	font-size: 2em;
 	font-weight: bold;
 	margin-bottom: 10px;
-	color: white;
+	color: var(--docs-white);
 }
 
 .md-typeset h1 {
 	margin-bottom: 1cm;
-	color: white;
+	color: var(--docs-white);
 	font-weight: bold;
 }
 
 .md-typeset h2 {
-	color: white;
+	color: var(--docs-white);
 	margin-top: 10px;
 	margin-bottom: 0px;
-}
-
-.md-typeset h3#there-are-drawbacks-to-using-these {
-	font-weight: bolder;
-	color: #ff1744;
-	margin-top: 10px;
-	margin-bottom: 0px;
-	font-size: 1.5em;
 }
 
 .md-typeset .admonition.danger li {
 	font-size: 1.2em;
-	color: #ff4a6f
+	color: var(--docs-red)
 }
 
 .md-typeset .admonition.danger {
-	background-color: #4b071563;
+	background-color: var(--docs-darkred);
 }
 
 .md-grid {
@@ -66,56 +58,47 @@
 .md-typeset ul li {
 	margin-bottom: 0px;
 	margin-top: 0px;
-	color: rgb(255, 223, 163);
+	color: var(--docs-yellow);
 }
 
-.md-typeset code {
-	color: #e6f9ff;
-	background-color: rgb(26, 26, 26);
+#no-top-margin {
+	margin-top: 0px;
 }
 
-#bytenet-header h2 {
+#header h2 {
 	font-weight: bolder;
-	color: white;
+	color: var(--docs-white);
 	margin-bottom: 0;
 	font-size: 1.5em;
 	margin-top: 10px;
 }
 
-#bytenet-header hr {
+hr {
 	margin-top: 0;
 	margin-bottom: 0;
 }
 
-#bytenet-header p {
+#header p {
 	font-size: 1.1em;
 	font-weight: lighter;
 	margin-top: 5px;
 	margin-bottom: 15px;
-	color: rgb(255, 255, 255);
+	color: var(--docs-white);
 }
 
-#bytenet-header #small {
-	font-size: 1em;
-	font-weight: lighter;
-	margin-top: 0px;
-	margin-bottom: 0px;
-	color: rgb(130, 152, 153)
-}
-
-#bytenet-header #linkspan {
+#header #linkspan {
 	margin-top: 25px;
 	margin-bottom: 10px;
 }
 
-#bytenet-header #link {
+#header #link {
 	margin-left: 10px;
 	margin-right: 10px;
 	color: hsl(187, 75%, 60%);
 	transition-duration: .1s;
 }
 
-#bytenet-header #link:hover {
+#header #link:hover {
 	color: hsl(187, 100%, 85%);
 	transition-duration: .1s;
 }
