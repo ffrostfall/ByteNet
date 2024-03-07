@@ -33,19 +33,17 @@ RunService.Heartbeat:Connect(function()
 		ReplicatedStorage.RemoteEvent:FireAllClients(data)
 	end]]
 
-	debug.profilebegin("send")
+	--[[debug.profilebegin("send")
 	for _ = 1, 100 do
 		--ReplicatedStorage.RemoteEvent:FireAllClients(out)
 		testPackets.myPacket.sendToAll(out)
 	end
-	debug.profileend()
+	debug.profileend()]]
 end)
 
 Players.PlayerAdded:Connect(function()
 	task.wait(1)
-	testPackets.myPacket.sendToAll({
-		myMessage = "",
-	})
+	testPackets.myPacket.sendToAll()
 end)
 
 testPackets.myPacket.listen(function(a)

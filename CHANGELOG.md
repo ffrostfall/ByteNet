@@ -8,7 +8,14 @@ ByteNet uses [semantic versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Improvements
 
-- 
+- Arrays are now forced to have number indexes
+
+### Fixes
+
+- Added all of the new data types to the ByteNet type.
+- Fixed the client not clearing instance references
+- Fixed the client sending a buffer every frame
+- Fixed instances/unknowns not being sendable in any special type
 
 ---
 

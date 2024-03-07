@@ -26,13 +26,13 @@ local function create()
 	}
 end
 
-local function dump(channel: types.channelData): (buffer, { unknown })
+local function dump(channel: types.channelData): (buffer, { unknown }?)
 	local cursor = channel.cursor
 	local dumpBuffer = buffer.create(cursor)
 
-	buffer.copy(dumpBuffer, 0, channel.buff, 0,   cursor)
+	buffer.copy(dumpBuffer, 0, channel.buff, 0, cursor)
 
-	return dumpBuffer, channel.references
+	return dumpBuffer, if #channel.references > 0 then channel.references else nil
 end
 -- No longer shared
 
@@ -120,14 +120,16 @@ function serverProcess.start()
 	RunService.Heartbeat:Connect(function()
 		-- Check if the channel has anything before trying to send it
 		if globalReliable.cursor > 0 then
-			reliableRemote:FireAllClients(dump(globalReliable))
+			local b, r = dump(globalReliable)
+			reliableRemote:FireAllClients(b, r)
 
 			globalReliable.cursor = 0
 			table.clear(globalReliable.references)
 		end
 
 		if globalUnreliable.cursor > 0 then
-			unreliableRemote:FireAllClients(dump(globalUnreliable))
+			local b, r = dump(globalUnreliable)
+			unreliableRemote:FireAllClients(b, r)
 
 			globalUnreliable.cursor = 0
 			table.clear(globalUnreliable.references)
@@ -135,14 +137,16 @@ function serverProcess.start()
 
 		for _, player in Players:GetPlayers() do
 			if perPlayerReliable[player].cursor > 0 then
-				reliableRemote:FireClient(player, dump(perPlayerReliable[player]))
+				local b, r = dump(perPlayerReliable[player])
+				reliableRemote:FireClient(player, b, r)
 
 				perPlayerReliable[player].cursor = 0
 				table.clear(perPlayerReliable[player].references)
 			end
 
 			if perPlayerUnreliable[player].cursor > 0 then
-				unreliableRemote:FireClient(player, dump(perPlayerUnreliable[player]))
+				local b, r = dump(perPlayerUnreliable[player])
+				unreliableRemote:FireClient(player, b, r)
 
 				perPlayerUnreliable[player].cursor = 0
 				table.clear(perPlayerUnreliable[player].references)

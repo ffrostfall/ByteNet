@@ -9,8 +9,8 @@ local alloc = bufferWriter.alloc
 local u8 = bufferWriter.u8
 local load = bufferWriter.load
 
-local function onClientEvent(receivedBuffer)
-	read(receivedBuffer)
+local function onClientEvent(receivedBuffer, ref)
+	read(receivedBuffer, ref)
 end
 
 -- Shared with: src/process/server.luau (Infeasible to split this into another file)
@@ -23,13 +23,13 @@ local function create()
 	}
 end
 
-local function dump(channel: types.channelData): buffer
+local function dump(channel: types.channelData): (buffer, { unknown }?)
 	local cursor = channel.cursor
 	local dumpBuffer = buffer.create(cursor)
 
 	buffer.copy(dumpBuffer, 0, channel.buff, 0, cursor)
 
-	return dumpBuffer, channel.references
+	return dumpBuffer, if #channel.references > 0 then channel.references else nil
 end
 -- No longer shared
 
@@ -67,17 +67,21 @@ function clientProcess.start()
 
 	RunService.Heartbeat:Connect(function()
 		-- Again, checking if there's anything in the channel before we send it.
-		if reliable ~= nil then
-			reliableRemote:FireServer(dump(reliable))
+		if reliable.cursor > 0 then
+			local b, r = dump(reliable)
+			reliableRemote:FireServer(b, r)
 
 			-- effectively clears the channel
 			reliable.cursor = 0
+			table.clear(reliable.references)
 		end
 
-		if unreliable ~= nil then
-			unreliableRemote:FireServer(dump(unreliable))
+		if unreliable.cursor > 0 then
+			local b, r = dump(unreliable)
+			unreliableRemote:FireServer(b, r)
 
 			unreliable.cursor = 0
+			table.clear(unreliable)
 		end
 	end)
 end

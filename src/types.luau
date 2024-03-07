@@ -51,8 +51,11 @@ export type ByteNet = {
 
 	struct: <T>(format: T) -> T,
 	bool: boolean,
-	array: <T>(value: T) -> { T },
+	array: <T>(value: T) -> { [number]: T },
 	optional: <T>(value: T) -> T?,
+	inst: Instance,
+	nothing: nil,
+	unknown: unknown,
 	uint8: number,
 	uint16: number,
 	uint32: number,

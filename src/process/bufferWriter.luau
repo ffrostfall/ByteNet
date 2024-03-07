@@ -70,6 +70,7 @@ function bufferWriter.reference(value: any)
 
 	buffer.writeu8(buff, cursor, index)
 	cursor += 1
+	print(references)
 end
 
 function bufferWriter.u16(value: number)

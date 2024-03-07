@@ -1,4 +1,5 @@
 local packetIDs = require(script.Parent.Parent.namespaces.packetIDs)
+local readRefs = require(script.Parent.readRefs)
 
 local ref = packetIDs.ref()
 local freeThread: thread?
@@ -29,11 +30,13 @@ return function(incomingBuffer: buffer, references: { [number]: unknown }?, play
 	local length = buffer.len(incomingBuffer)
 	local readCursor = 0
 
+	readRefs.set(references)
+
 	while readCursor < length do
 		local packet = ref[buffer.readu8(incomingBuffer, readCursor)]
 		readCursor += 1
 
-		local value, valueLength = packet.reader(incomingBuffer, readCursor, references)
+		local value, valueLength = packet.reader(incomingBuffer, readCursor)
 
 		readCursor += valueLength
 

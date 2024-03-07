@@ -1,4 +1,5 @@
 local bufferWriter = require(script.Parent.Parent.process.bufferWriter)
+local readRefs = require(script.Parent.Parent.process.readRefs)
 local types = require(script.Parent.Parent.types)
 
 local reference = bufferWriter.reference
@@ -11,12 +12,14 @@ return function(): types.dataTypeInterface<Instance?>
 			reference(value)
 		end,
 
-		read = function(b: buffer, cursor: number, references)
-			if not references then
+		read = function(b: buffer, cursor: number)
+			local refs = readRefs.get()
+
+			if not refs then
 				return nil, 1
 			end
 
-			local ref = references[buffer.readu8(b, cursor)]
+			local ref = refs[buffer.readu8(b, cursor)]
 
 			if typeof(ref) == "Instance" then
 				return ref, 1
