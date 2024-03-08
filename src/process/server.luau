@@ -50,8 +50,13 @@ local function onServerEvent(player: Player, data, references)
 end
 
 local function playerAdded(player)
-	perPlayerReliable[player] = create()
-	perPlayerUnreliable[player] = create()
+	if not perPlayerReliable[player] then
+		perPlayerReliable[player] = create()
+	end
+
+	if not perPlayerUnreliable[player] then
+		perPlayerUnreliable[player] = create()
+	end
 end
 
 local serverProcess = {}
@@ -67,7 +72,7 @@ function serverProcess.sendAllReliable(id: number, writer: (value: any) -> (), d
 end
 
 function serverProcess.sendAllUnreliable(id: number, writer: (value: any) -> (), data: { [string]: any })
-	load(globalUnreliable)
+	load(globalUnreliable or create())
 
 	alloc(1)
 	u8(id)
@@ -82,7 +87,7 @@ function serverProcess.sendPlayerReliable(
 	writer: (value: any) -> (),
 	data: { [string]: any }
 )
-	load(perPlayerReliable[player])
+	load(perPlayerReliable[player] or create())
 
 	alloc(1)
 	u8(id)
