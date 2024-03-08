@@ -4,6 +4,14 @@ ByteNet uses [semantic versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
+## 0.4.2
+
+### Fixes
+
+- Fixed sending unreliable events from client -> server
+
+---
+
 ## 0.4.1
 
 ### Improvements

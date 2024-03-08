@@ -81,7 +81,7 @@ function clientProcess.start()
 			unreliableRemote:FireServer(b, r)
 
 			unreliable.cursor = 0
-			table.clear(unreliable)
+			table.clear(unreliable.references)
 		end
 	end)
 end
