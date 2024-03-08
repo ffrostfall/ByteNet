@@ -57,7 +57,7 @@ return function(props: types.packetProps<types.dataTypeInterface<any>>, id: numb
 	exported.reader = props.value.read
 
 	if moduleRunContext == "server" then
-		function exported.sendToPlayers(data, players: { Player })
+		function exported.sendToList(data, players: { Player })
 			for _, player in players do
 				serverSendFunction(player, id, writer, data)
 			end
