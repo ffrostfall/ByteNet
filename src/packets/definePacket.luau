@@ -1,3 +1,6 @@
+--!native
+--!optimize 2
+
 --[[
 	Exists so that the namespace can set the ID of the packet
 

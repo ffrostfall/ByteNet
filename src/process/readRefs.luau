@@ -1,3 +1,4 @@
+--!native
 local current
 
 local readRefs = {}

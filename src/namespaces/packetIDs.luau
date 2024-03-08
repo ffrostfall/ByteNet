@@ -1,3 +1,5 @@
+--!native
+
 --[[
 	Exists solely to get a packet instance from an ID in the reader file.
 	Might be able to be done in a better way?
