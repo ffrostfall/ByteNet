@@ -17,10 +17,11 @@ local buff = {
 	end,
 	write = function(data: buffer)
 		local length = buffer.len(data)
-		dyn_alloc(length + 2)
+		u16(length)
+
+		dyn_alloc(length)
 
 		-- write the length of the buffer, then the buffer itself
-		u16(length)
 		copy(data)
 	end,
 }

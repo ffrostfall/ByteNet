@@ -8,9 +8,9 @@ local testPackets = require(ReplicatedStorage.shared.testPackets)
 --print(data)
 --end)
 
-testPackets.myPacket.listen(function(data)
-	print("Confirming server -> client")
-	print(data)
+testPackets.myPacket.listen(function(_)
+	--print("Confirming server -> client")
+	--print(data)
 end)
 --
 task.wait(2)

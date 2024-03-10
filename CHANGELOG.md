@@ -4,6 +4,20 @@ ByteNet uses [semantic versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
+## 0.4.3
+
+### Fixes
+
+- Fixed `i16` allocating 8 bytes instead of 2.
+
+### Improvements
+
+- Significant optimization to optional types
+- Array serialization is roughly ~2x as efficient
+- All data type write functions now directly reference the buffer writer. This means all allocation calls are inlined, and there are roughly ~3x less function calls.
+
+---
+
 ## 0.4.2
 
 ### Fixes

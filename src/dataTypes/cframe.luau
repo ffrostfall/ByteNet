@@ -1,7 +1,7 @@
 local bufferWriter = require(script.Parent.Parent.process.bufferWriter)
 local types = require(script.Parent.Parent.types)
 
-local f32 = bufferWriter.f32
+local f32NoAlloc = bufferWriter.f32NoAlloc
 local alloc = bufferWriter.alloc
 
 -- thanks jack :p
@@ -30,12 +30,12 @@ local cframe = {
 
 		-- Math done, write it now
 		alloc(24)
-		f32(x)
-		f32(y)
-		f32(z)
-		f32(rx)
-		f32(ry)
-		f32(rz)
+		f32NoAlloc(x)
+		f32NoAlloc(y)
+		f32NoAlloc(z)
+		f32NoAlloc(rx)
+		f32NoAlloc(ry)
+		f32NoAlloc(rz)
 	end,
 }
 

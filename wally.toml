@@ -1,6 +1,6 @@
 [package]
 name = "ffrostflame/bytenet"
-version = "0.4.2"
+version = "0.4.3-dev"
 registry = "https://github.com/UpliftGames/wally-index"
 realm = "shared"
 

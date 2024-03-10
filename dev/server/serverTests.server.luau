@@ -19,13 +19,8 @@ local testPackets = require(ReplicatedStorage.shared.testPackets)
 }]]
 
 local out = {}
-for _ = 1, 100 do
-	table.insert(out, {
-		a = 5,
-		b = 4,
-		c = "",
-		d = 2,
-	})
+for _ = 1, 1000 do
+	table.insert(out, if math.random(1, 2) == 1 then true else false)
 end
 
 RunService.Heartbeat:Connect(function()
@@ -33,17 +28,17 @@ RunService.Heartbeat:Connect(function()
 		ReplicatedStorage.RemoteEvent:FireAllClients(data)
 	end]]
 
-	--[[debug.profilebegin("send")
+	debug.profilebegin("send")
 	for _ = 1, 100 do
 		--ReplicatedStorage.RemoteEvent:FireAllClients(out)
 		testPackets.myPacket.sendToAll(out)
 	end
-	debug.profileend()]]
+	debug.profileend()
 end)
 
 Players.PlayerAdded:Connect(function()
 	task.wait(1)
-	testPackets.myPacket.sendToAll()
+	--testPackets.myPacket.sendToAll()
 end)
 
 testPackets.myPacket.listen(function(a)

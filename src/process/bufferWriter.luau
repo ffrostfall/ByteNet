@@ -54,11 +54,13 @@ bufferWriter.alloc = alloc
 bufferWriter.dyn_alloc = dyn_alloc
 
 function bufferWriter.u8(value: number)
+	alloc(1)
 	buffer.writeu8(buff, cursor, value)
 	cursor += 1
 end
 
 function bufferWriter.i8(value: number)
+	alloc(1)
 	buffer.writei8(buff, cursor, value)
 	cursor += 1
 end
@@ -74,16 +76,19 @@ function bufferWriter.reference(value: any)
 end
 
 function bufferWriter.u16(value: number)
+	alloc(2)
 	buffer.writeu16(buff, cursor, value)
 	cursor += 2
 end
 
 function bufferWriter.i16(value: number)
+	alloc(2)
 	buffer.writeu16(buff, cursor, value)
 	cursor += 2
 end
 
 function bufferWriter.u32(value: number)
+	alloc(4)
 	buffer.writeu32(buff, cursor, value)
 	cursor += 4
 end
@@ -94,16 +99,29 @@ function bufferWriter.writestring(value: string)
 end
 
 function bufferWriter.i32(value: number)
+	alloc(4)
 	buffer.writei32(buff, cursor, value)
 	cursor += 4
 end
 
+function bufferWriter.f32NoAlloc(value: number)
+	buffer.writef32(buff, cursor, value)
+	cursor += 4
+end
+
+function bufferWriter.f64NoAlloc(value: number)
+	buffer.writef64(buff, cursor, value)
+	cursor += 4
+end
+
 function bufferWriter.f32(value: number)
+	alloc(4)
 	buffer.writef32(buff, cursor, value)
 	cursor += 4
 end
 
 function bufferWriter.f64(value: number)
+	alloc(8)
 	buffer.writef64(buff, cursor, value)
 	cursor += 8
 end
@@ -113,13 +131,9 @@ function bufferWriter.copy(value)
 	cursor += buffer.len(value)
 end
 
-function bufferWriter.btrue()
-	buffer.writeu8(buff, cursor, 1)
-	cursor += 1
-end
-
-function bufferWriter.bfalse()
-	buffer.writeu8(buff, cursor, 0)
+function bufferWriter.bool(val: boolean)
+	alloc(1)
+	buffer.writeu8(buff, cursor, if val then 1 else 0)
 	cursor += 1
 end
 

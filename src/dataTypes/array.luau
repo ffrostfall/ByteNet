@@ -2,7 +2,6 @@ local bufferWriter = require(script.Parent.Parent.process.bufferWriter)
 local types = require(script.Parent.Parent.types)
 
 local u16 = bufferWriter.u16
-local alloc = bufferWriter.alloc
 
 --[[
 	Create a new array with the given dataTypeInterface
@@ -27,12 +26,12 @@ return function(valueType: types.dataTypeInterface<any>)
 			return array, arrayCursor - cursor
 		end,
 		write = function(value: any)
-			alloc(2)
-			u16(#value) -- write length, 2 bytes
+			local length = #value
+			u16(length)
 
-			for _, item in value do
-				-- add the length of the item to the cursor
-				valueWrite(item)
+			-- numeric iteration is about 2x faster than generic iteration
+			for i = 1, length do
+				valueWrite(value[i])
 			end
 		end,
 	}

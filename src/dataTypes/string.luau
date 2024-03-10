@@ -15,9 +15,9 @@ local str = {
 	end,
 	write = function(data: string)
 		local length = string.len(data)
-		dyn_alloc(length + 2)
-
 		u16(length)
+
+		dyn_alloc(length)
 		writestring(data)
 	end,
 }
