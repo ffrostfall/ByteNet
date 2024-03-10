@@ -25,8 +25,13 @@ return function(valueType: types.dataTypeInterface<any>)
 		end,
 
 		write = function(value: any)
-			bool(value ~= nil)
-			valueWrite(value)
+			local exists = value ~= nil
+
+			bool(exists)
+
+			if exists then
+				valueWrite(value)
+			end
 		end,
 	}
 end :: <T>(valueType: types.dataTypeInterface<T>) -> types.dataTypeInterface<T?>
