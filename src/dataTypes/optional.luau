@@ -1,7 +1,7 @@
 local bufferWriter = require(script.Parent.Parent.process.bufferWriter)
 local types = require(script.Parent.Parent.types)
 
-local bool = bufferWriter.bool
+local writebool = bufferWriter.writebool
 
 return function(valueType: types.dataTypeInterface<any>)
 	local valueRead = valueType.read
@@ -27,7 +27,7 @@ return function(valueType: types.dataTypeInterface<any>)
 		write = function(value: any)
 			local exists = value ~= nil
 
-			bool(exists)
+			writebool(exists)
 
 			if exists then
 				valueWrite(value)

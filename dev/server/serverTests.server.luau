@@ -29,7 +29,7 @@ RunService.Heartbeat:Connect(function()
 	end]]
 
 	debug.profilebegin("send")
-	for _ = 1, 100 do
+	for _ = 1, 1000 do
 		--ReplicatedStorage.RemoteEvent:FireAllClients(out)
 		testPackets.myPacket.sendToAll(out)
 	end

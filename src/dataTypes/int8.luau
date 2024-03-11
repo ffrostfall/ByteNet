@@ -1,10 +1,10 @@
 local bufferWriter = require(script.Parent.Parent.process.bufferWriter)
 local types = require(script.Parent.Parent.types)
 
-local i8 = bufferWriter.i8
+local writei8 = bufferWriter.writei8
 
 local int8 = {
-	write = i8,
+	write = writei8,
 
 	read = function(b: buffer, cursor: number)
 		return buffer.readi8(b, cursor), 1

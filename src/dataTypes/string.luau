@@ -1,8 +1,9 @@
 local bufferWriter = require(script.Parent.Parent.process.bufferWriter)
 local types = require(script.Parent.Parent.types)
 
-local u16 = bufferWriter.u16
+local writeu16 = bufferWriter.writeu16
 local writestring = bufferWriter.writestring
+
 local dyn_alloc = bufferWriter.dyn_alloc
 
 local str = {
@@ -15,7 +16,7 @@ local str = {
 	end,
 	write = function(data: string)
 		local length = string.len(data)
-		u16(length)
+		writeu16(length)
 
 		dyn_alloc(length)
 		writestring(data)

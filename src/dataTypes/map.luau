@@ -1,7 +1,7 @@
 local bufferWriter = require(script.Parent.Parent.process.bufferWriter)
 local types = require(script.Parent.Parent.types)
 
-local u16 = bufferWriter.u16
+local writeu16 = bufferWriter.writeu16
 
 -- thanks jack :p
 return function(
@@ -42,7 +42,7 @@ return function(
 			end
 
 			-- Write length
-			u16(count)
+			writeu16(count)
 
 			for k, v in map do
 				-- Write key/value pairs

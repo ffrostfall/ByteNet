@@ -12,7 +12,7 @@ local boolean = {
 		return buffer.readu8(b, cursor) == 1, 1
 	end,
 
-	write = bufferWriter.bool,
+	write = bufferWriter.writebool,
 }
 
 return function(): types.dataTypeInterface<boolean>

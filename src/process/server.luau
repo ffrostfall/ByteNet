@@ -8,9 +8,7 @@ local types = require(script.Parent.Parent.types)
 local read = require(script.Parent.read)
 local bufferWriter = require(script.Parent.bufferWriter)
 
-local alloc = bufferWriter.alloc
-local u8 = bufferWriter.u8
-local load = bufferWriter.load
+local writePacket = bufferWriter.writePacket
 
 -- All channelData is set to nil upon being sent which is why these are all optionals
 local perPlayerReliable: { [Player]: types.channelData } = {}
@@ -62,23 +60,11 @@ end
 local serverProcess = {}
 
 function serverProcess.sendAllReliable(id: number, writer: (value: any) -> (), data: { [string]: any })
-	load(globalReliable)
-
-	alloc(1)
-	u8(id)
-	writer(data)
-
-	globalReliable = bufferWriter.export()
+	globalReliable = writePacket(globalReliable, id, writer, data)
 end
 
 function serverProcess.sendAllUnreliable(id: number, writer: (value: any) -> (), data: { [string]: any })
-	load(globalUnreliable or create())
-
-	alloc(1)
-	u8(id)
-	writer(data)
-
-	globalUnreliable = bufferWriter.export()
+	globalUnreliable = writePacket(globalUnreliable, id, writer, data)
 end
 
 function serverProcess.sendPlayerReliable(
@@ -87,13 +73,7 @@ function serverProcess.sendPlayerReliable(
 	writer: (value: any) -> (),
 	data: { [string]: any }
 )
-	load(perPlayerReliable[player] or create())
-
-	alloc(1)
-	u8(id)
-	writer(data)
-
-	perPlayerReliable[player] = bufferWriter.export()
+	perPlayerReliable[player] = writePacket(perPlayerReliable[player], id, writer, data)
 end
 
 function serverProcess.sendPlayerUnreliable(
@@ -102,13 +82,7 @@ function serverProcess.sendPlayerUnreliable(
 	writer: (value: any) -> (),
 	data: { [string]: any }
 )
-	load(perPlayerUnreliable[player])
-
-	alloc(1)
-	u8(id)
-	writer(data)
-
-	perPlayerUnreliable[player] = bufferWriter.export()
+	perPlayerUnreliable[player] = writePacket(perPlayerUnreliable[player], id, writer, data)
 end
 
 function serverProcess.start()

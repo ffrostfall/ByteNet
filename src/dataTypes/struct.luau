@@ -12,7 +12,7 @@ type structData = {
 
 return function(input: {
 	[string]: types.dataTypeInterface<any>,
-}): types.dataTypeInterface<any>
+}): types.dataTypeInterface<{}>
 	-- This is used in the reading/writing parts, and isn't used in the initialization code
 	-- It's used to store the index-value pairs and the index-key pairs
 	-- Index being the position of the value in the array, and the key being the key in the struct dictionary

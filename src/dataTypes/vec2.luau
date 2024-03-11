@@ -1,7 +1,7 @@
 local bufferWriter = require(script.Parent.Parent.process.bufferWriter)
 local types = require(script.Parent.Parent.types)
 
-local f32NoAlloc = bufferWriter.f32NoAlloc
+local writef32NoAlloc = bufferWriter.writef32NoAlloc
 local alloc = bufferWriter.alloc
 
 local vec2 = {
@@ -15,8 +15,8 @@ local vec2 = {
 
 	write = function(value: Vector2)
 		alloc(8)
-		f32NoAlloc(value.X)
-		f32NoAlloc(value.Y)
+		writef32NoAlloc(value.X)
+		writef32NoAlloc(value.Y)
 	end,
 }
 

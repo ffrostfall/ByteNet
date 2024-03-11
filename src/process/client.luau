@@ -5,9 +5,7 @@ local types = require(script.Parent.Parent.types)
 local read = require(script.Parent.read)
 local bufferWriter = require(script.Parent.bufferWriter)
 
-local alloc = bufferWriter.alloc
-local u8 = bufferWriter.u8
-local load = bufferWriter.load
+local writePacket = bufferWriter.writePacket
 
 local function onClientEvent(receivedBuffer, ref)
 	read(receivedBuffer, ref)
@@ -39,23 +37,11 @@ local unreliable: types.channelData = create()
 local clientProcess = {}
 
 function clientProcess.sendReliable(id: number, writer: (value: any) -> (), data: { [string]: any })
-	reliable = load(reliable)
-
-	alloc(1)
-	u8(id)
-	writer(data)
-
-	reliable = bufferWriter.export()
+	reliable = writePacket(reliable, id, writer, data)
 end
 
 function clientProcess.sendUnreliable(id: number, writer: (value: any) -> (), data: { [string]: any })
-	unreliable = load(unreliable)
-
-	alloc(1)
-	u8(id)
-	writer(data)
-
-	unreliable = bufferWriter.export()
+	unreliable = writePacket(unreliable, id, writer, data)
 end
 
 function clientProcess.start()

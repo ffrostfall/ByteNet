@@ -1,10 +1,10 @@
 local bufferWriter = require(script.Parent.Parent.process.bufferWriter)
 local types = require(script.Parent.Parent.types)
 
-local f64 = bufferWriter.f64
+local writef64 = bufferWriter.writef64
 
 local float64 = {
-	write = f64,
+	write = writef64,
 
 	read = function(b: buffer, cursor: number)
 		return buffer.readf64(b, cursor), 8

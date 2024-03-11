@@ -1,7 +1,7 @@
 local bufferWriter = require(script.Parent.Parent.process.bufferWriter)
 local types = require(script.Parent.Parent.types)
 
-local f32 = bufferWriter.f32
+local f32 = bufferWriter.writef32
 
 local float32 = {
 	write = f32,

@@ -1,3 +1,4 @@
+--!optimize 2
 --!native
 local packetIDs = require(script.Parent.Parent.namespaces.packetIDs)
 local readRefs = require(script.Parent.readRefs)

@@ -1,8 +1,8 @@
 local bufferWriter = require(script.Parent.Parent.process.bufferWriter)
 local types = require(script.Parent.Parent.types)
 
-local u16 = bufferWriter.u16
-local copy = bufferWriter.copy
+local writeu16 = bufferWriter.writeu16
+local writecopy = bufferWriter.writecopy
 local dyn_alloc = bufferWriter.dyn_alloc
 
 local buff = {
@@ -17,12 +17,12 @@ local buff = {
 	end,
 	write = function(data: buffer)
 		local length = buffer.len(data)
-		u16(length)
+		writeu16(length)
 
 		dyn_alloc(length)
 
 		-- write the length of the buffer, then the buffer itself
-		copy(data)
+		writecopy(data)
 	end,
 }
 

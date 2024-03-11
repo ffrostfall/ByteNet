@@ -2,14 +2,14 @@ local bufferWriter = require(script.Parent.Parent.process.bufferWriter)
 local readRefs = require(script.Parent.Parent.process.readRefs)
 local types = require(script.Parent.Parent.types)
 
-local reference = bufferWriter.reference
+local writeReference = bufferWriter.writeReference
 local alloc = bufferWriter.alloc
 
 return function(): types.dataTypeInterface<unknown>
 	return {
 		write = function(value: unknown)
 			alloc(1)
-			reference(value)
+			writeReference(value)
 		end,
 
 		read = function(b: buffer, cursor: number)
