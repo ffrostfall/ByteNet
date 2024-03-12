@@ -7,9 +7,10 @@ local writeu16 = bufferWriter.writeu16
 --[[
 	Create a new array with the given dataTypeInterface
 ]]
-return function(valueType: types.dataTypeInterface<any>)
+return function<T>(valueType: types.dataTypeInterface<T>): types.dataTypeInterface<{ [number]: T }>
 	local valueWrite = valueType.write
 	local valueRead = valueType.read
+	
 
 	return {
 		read = function(b: buffer, cursor: number)

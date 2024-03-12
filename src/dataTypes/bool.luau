@@ -12,6 +12,8 @@ local boolean = {
 		return buffer.readu8(b, cursor) == 1, 1
 	end,
 
+	length = 1,
+
 	write = bufferWriter.writebool,
 }
 

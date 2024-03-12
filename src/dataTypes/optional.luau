@@ -3,7 +3,7 @@ local types = require(script.Parent.Parent.types)
 
 local writebool = bufferWriter.writebool
 
-return function(valueType: types.dataTypeInterface<any>)
+return function<T>(valueType: types.dataTypeInterface<T>): types.dataTypeInterface<T?>
 	local valueRead = valueType.read
 	local valueWrite = valueType.write
 
@@ -34,4 +34,4 @@ return function(valueType: types.dataTypeInterface<any>)
 			end
 		end,
 	}
-end :: <T>(valueType: types.dataTypeInterface<T>) -> types.dataTypeInterface<T?>
+end

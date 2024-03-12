@@ -30,7 +30,8 @@ export type channelData = {
 -- Used internally for serializing and deserializing all data types
 export type dataTypeInterface<T> = {
 	write: (value: T) -> (),
-	read: (b: buffer, cursor: number, references: { [number]: unknown }?) -> (T, number),
+	read: (b: buffer, cursor: number) -> (T, number),
+	length: number?,
 }
 
 -- Somewhat public facing: used as return result in definePacket
@@ -38,6 +39,7 @@ type Packet<T> = {
 	sendToAll: (data: T) -> (),
 	sendTo: (data: T, target: Player) -> (),
 	sendToList: (data: T, targets: { Player }) -> (),
+	sendToAllExcept: (data: T, exceptions: { Player }) -> (),
 
 	wait: () -> T,
 	send: (data: T, target: Player?) -> (),
