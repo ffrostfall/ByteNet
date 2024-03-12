@@ -42,26 +42,27 @@ export namespace ByteNet {
       [packetName: string]: packet<ByteNetType<any>>;
     },
   >(
+    name: string,
     namespaceDefine: () => T,
   ): {
     [packetName in keyof T]: T[packetName];
   };
 
   // Primitive types
-  export function i8(): ByteNetType<number>;
-  export function i16(): ByteNetType<number>;
-  export function i32(): ByteNetType<number>;
-  export function u8(): ByteNetType<number>;
-  export function u16(): ByteNetType<number>;
-  export function u32(): ByteNetType<number>;
-  export function f32(): ByteNetType<number>;
-  export function f64(): ByteNetType<number>;
-  export function string(): ByteNetType<string>;
-  export function bool(): ByteNetType<boolean>;
-  export function buff(): ByteNetType<buffer>;
-  export function inst(): ByteNetType<Instance>;
-  export function nothing(): ByteNetType<void>;
-  export function unknown(): ByteNetType<unknown>;
+  export const i8: ByteNetType<number>;
+  export const i16: ByteNetType<number>;
+  export const i32: ByteNetType<number>;
+  export const u8: ByteNetType<number>;
+  export const u16: ByteNetType<number>;
+  export const u32: ByteNetType<number>;
+  export const f32: ByteNetType<number>;
+  export const f64: ByteNetType<number>;
+  export const string: ByteNetType<string>;
+  export const bool: ByteNetType<boolean>;
+  export const buff: ByteNetType<buffer>;
+  export const inst: ByteNetType<Instance>;
+  export const nothing: ByteNetType<void>;
+  export const unknown: ByteNetType<unknown>;
 
   // Special types
   export function array<T extends ByteNetType<any>>(type: T): array<T>;
