@@ -4,6 +4,14 @@ ByteNet uses [semantic versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
+## 0.4.4
+
+### Fixes
+
+- Fixed `sendToAllExcept` type
+
+---
+
 ## 0.4.3
 
 ### Fixes
@@ -56,18 +64,21 @@ ByteNet uses [semantic versioning](https://semver.org/spec/v2.0.0.html).
 ## 0.4.0-rc3
 
 ### Added
+
 - Namespaces have been added.
 - Structs have been added.
 - Three new data types: Instance, unknown, and nothing. The "nothing" type is to allow for packets without any contents.
 - Added `:wait()` to packets.
 
 ### Improvements
+
 - Packets are now based off closures, instead of metatables. This means you now have to use `.` indexxing instead of `:` to call methods.
 - You can now have duplicate packet contents
 - Packets now take a single value (Which can be a struct) instead of being "special".
 - Significant optimization: Packets are now singular values that can be structs, which reduces complexity, thus increasing performance.
 
 ### Fixes
+
 - Added `:sendTo()` to the `Packet` type. This fixes autocomplete.
 
 ---
@@ -75,6 +86,7 @@ ByteNet uses [semantic versioning](https://semver.org/spec/v2.0.0.html).
 ## 0.3.1
 
 ### Improvements
+
 - Rewrote serialization to use an allocator w/ resizing instead of using "deferred write" functions. Should be an incredibly large performance boost.
 
 ---
@@ -82,9 +94,11 @@ ByteNet uses [semantic versioning](https://semver.org/spec/v2.0.0.html).
 ## 0.3.0
 
 ### Added
+
 - Types: Vector2, CFrame, Array, Optional, Map
 
 ### Improvements
+
 - Rewrote client/server processing. Should drastically improve stability and performance.
 - Completely re-did how serialization happens to be a lot more stable, and to allow a lot of room for improvement.
 - Many type improvements
