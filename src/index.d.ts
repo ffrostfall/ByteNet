@@ -31,7 +31,7 @@ declare type map<
   V extends ByteNetType<any>,
 > = ByteNetType<Map<K["value"], V["value"]>>;
 
-export namespace ByteNet {
+declare namespace ByteNet {
   export function definePacket<T extends ByteNetType<any>>(packetProps: {
     value: T;
     reliabilityType: "reliable" | "unreliable";
@@ -61,6 +61,7 @@ export namespace ByteNet {
   export const bool: ByteNetType<boolean>;
   export const buff: ByteNetType<buffer>;
   export const inst: ByteNetType<Instance>;
+  export const cframe: ByteNetType<CFrame>;
   export const vec3: ByteNetType<Vector3>;
   export const vec2: ByteNetType<Vector2>;
   export const nothing: ByteNetType<void>;
@@ -77,3 +78,5 @@ export namespace ByteNet {
     value: V,
   ): map<K, V>;
 }
+
+export = ByteNet;
