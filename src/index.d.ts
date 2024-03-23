@@ -5,16 +5,16 @@ declare class packet<T extends ByteNetType<any>> {
   listen: (callback: (data: T["value"], player?: Player) => void) => void;
   wait: () => T["value"]
 
-	/** @client */
+  /** @client */
   send: (data: T["value"]) => void;
 
-	/** @server */
+  /** @server */
   sendToAll: (data: T["value"]) => void;
   /** @server */
   sendTo: (data: T["value"], player: Player) => void;
   /** @server */
   sendToList: (data: T["value"], players: Player[]) => void;
-	/** @server */
+  /** @server */
   sendToAllExcept: (data: T["value"], exception: Player) => void;
 }
 
