@@ -3,7 +3,7 @@
 declare class packet<T extends ByteNetType<any>> {
   // can't have server and client overloads while keeping dot access to methods because of how typescript works
   listen: (callback: (data: T["value"], player?: Player) => void) => void;
-  wait: () => T["value"]
+  wait: () => T["value"];
 
   /** @client */
   send: (data: T["value"]) => void;
