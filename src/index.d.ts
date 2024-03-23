@@ -49,18 +49,20 @@ export namespace ByteNet {
   };
 
   // Primitive types
-  export const i8: ByteNetType<number>;
-  export const i16: ByteNetType<number>;
-  export const i32: ByteNetType<number>;
-  export const u8: ByteNetType<number>;
-  export const u16: ByteNetType<number>;
-  export const u32: ByteNetType<number>;
-  export const f32: ByteNetType<number>;
-  export const f64: ByteNetType<number>;
+  export const int8: ByteNetType<number>;
+  export const int16: ByteNetType<number>;
+  export const int32: ByteNetType<number>;
+  export const uint8: ByteNetType<number>;
+  export const uint16: ByteNetType<number>;
+  export const uint32: ByteNetType<number>;
+  export const float32: ByteNetType<number>;
+  export const float64: ByteNetType<number>;
   export const string: ByteNetType<string>;
   export const bool: ByteNetType<boolean>;
   export const buff: ByteNetType<buffer>;
   export const inst: ByteNetType<Instance>;
+  export const vec3: ByteNetType<Vector3>;
+  export const vec2: ByteNetType<Vector2>;
   export const nothing: ByteNetType<void>;
   export const unknown: ByteNetType<unknown>;
 
