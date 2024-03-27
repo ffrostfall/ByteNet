@@ -56,6 +56,11 @@ local bufferWriter = {}
 bufferWriter.alloc = alloc
 bufferWriter.dyn_alloc = dyn_alloc
 
+function bufferWriter.writeu8NoAlloc(value: number)
+	buffer.writeu8(buff, cursor, value)
+	cursor += 1
+end
+
 function bufferWriter.writeu8(value: number)
 	alloc(1)
 	buffer.writeu8(buff, cursor, value)
@@ -75,7 +80,6 @@ function bufferWriter.writeReference(value: any)
 
 	buffer.writeu8(buff, cursor, index)
 	cursor += 1
-	print(references)
 end
 
 function bufferWriter.writeu16(value: number)

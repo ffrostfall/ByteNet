@@ -39,7 +39,7 @@ type Packet<T> = {
 	sendToAll: (data: T) -> (),
 	sendTo: (data: T, target: Player) -> (),
 	sendToList: (data: T, targets: { Player }) -> (),
-	sendToAllExcept: (data: T, exceptions: { Player }) -> (),
+	sendToAllExcept: (data: T, exceptions: Player) -> (),
 
 	wait: () -> T,
 	send: (data: T, target: Player?) -> (),
