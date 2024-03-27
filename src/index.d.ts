@@ -38,7 +38,7 @@ declare type map<
 declare namespace ByteNet {
   export function definePacket<T extends ByteNetType<any>>(packetProps: {
     value: T;
-    reliabilityType: "reliable" | "unreliable";
+    reliabilityType?: "reliable" | "unreliable";
   }): packet<T>;
 
   export function defineNamespace<
