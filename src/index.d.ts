@@ -22,7 +22,7 @@ type ByteNetType<T> = {
   value: T;
 };
 
-declare type array<T extends ByteNetType<any>> = ByteNetType<T[]>;
+declare type array<T extends ByteNetType<any>> = ByteNetType<T["value"][]>;
 declare type struct<T extends { [index: string]: ByteNetType<any> }> =
   ByteNetType<{
     [valueName in keyof T]: T[valueName]["value"];
