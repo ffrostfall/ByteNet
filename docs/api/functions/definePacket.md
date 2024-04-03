@@ -71,7 +71,7 @@ local someArbitraryPlayer = Players.You
 
 packets.myPacket:sendToAllExcept({
 	message = "Hello, everyone except one person!"
-})
+}, someArbitraryPlayer)
 ```
 
 ## Receiving
