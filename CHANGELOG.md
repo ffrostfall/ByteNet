@@ -4,6 +4,12 @@ ByteNet uses [semantic versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
+## 0.5.0
+
+- Rewrote everything.
+
+---
+
 ## 0.4.4
 
 ### Fixes
