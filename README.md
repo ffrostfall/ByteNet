@@ -28,4 +28,4 @@ Further documentation [here](https://ffrostflame.github.io/ByteNet/).
 
 ## License
 
-This project is under the MIT license! so, it's open source.
+This project is under the MIT license! so, it's open source
