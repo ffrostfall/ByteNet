@@ -4,7 +4,6 @@ local types = require(script.Parent.Parent.types)
 local writef32NoAlloc = bufferWriter.writef32NoAlloc
 local alloc = bufferWriter.alloc
 
--- thanks jack :p
 local cframe = {
 	read = function(b: buffer, cursor: number)
 		local x = buffer.readf32(b, cursor)
@@ -13,21 +12,13 @@ local cframe = {
 		local rx = buffer.readf32(b, cursor + 12)
 		local ry = buffer.readf32(b, cursor + 16)
 		local rz = buffer.readf32(b, cursor + 20)
-
-		-- Re-construct the CFrame from the axis-angle representation
-		local axis = Vector3.new(rx, ry, rz)
-		local angle = axis.Magnitude
-
-		return CFrame.fromAxisAngle(axis, angle) + Vector3.new(x, y, z), 24
+		
+		return CFrame.new(x, y, z) * CFrame.Angles(rx, ry, rz), 24
 	end,
 	write = function(value: CFrame)
-		-- Convert the CFrame to an axis-angle representation
 		local x, y, z = value.X, value.Y, value.Z
-
-		local axis, angle = value:ToAxisAngle()
-		local rx, ry, rz = axis.X, axis.Y, axis.Z
-		axis = axis * angle
-
+		local rx, ry, rz = value:ToEulerAnglesXYZ()
+		
 		-- Math done, write it now
 		alloc(24)
 		writef32NoAlloc(x)
