@@ -12,7 +12,7 @@ local color3 = {
 		uint8NoAlloc(input.B * 255)
 	end,
 	read = function(b: buffer, cursor: number)
-		return Color3.new(buffer.readu8(b, cursor), buffer.readu8(b, cursor + 1), buffer.readu8(b, cursor + 2)), 3
+		return Color3.fromRGB(buffer.readu8(b, cursor), buffer.readu8(b, cursor + 1), buffer.readu8(b, cursor + 2)), 3
 	end,
 }
 
