@@ -6,7 +6,7 @@
 
 ## Simple, buffer-based networking.
 
-[GitHub](https://github.com/ffrostflame/ByteNet) | [Documentation](https://ffrostflame.github.io/ByteNet/)
+[GitHub](https://github.com/ffrostflame/ByteNet) | [Documentation](https://ffrostfall.github.io/ByteNet/)
 
 </div>
 
@@ -24,7 +24,7 @@ ByteNet performs incredibly well compared to non-buffer based libraries like Bri
 
 You can contact me directly under the ByteNet thread in the [Roblox OSS Server](https://discord.gg/5KjV64PA3d).
 
-Further documentation [here](https://ffrostflame.github.io/ByteNet/).
+Further documentation [here](https://ffrostfall.github.io/ByteNet/).
 
 ## License
 
