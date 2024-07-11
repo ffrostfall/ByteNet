@@ -6,7 +6,7 @@
 
 ## Simple, buffer-based networking.
 
-[GitHub](https://github.com/ffrostflame/ByteNet) | [Documentation](https://ffrostfall.github.io/ByteNet/)
+[GitHub](https://github.com/ffrostfall/ByteNet) | [Documentation](https://ffrostfall.github.io/ByteNet/)
 
 </div>
 

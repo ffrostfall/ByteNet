@@ -4,6 +4,19 @@ ByteNet uses [semantic versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
+## 0.4.6
+
+### Fixes
+
+- Fixed Color3 data type by @buildthomas in [#18](https://github.com/ffrostfall/ByteNet/pull/18)
+- Fixed CFrame data type by @HooferDevelops in [16](https://github.com/ffrostfall/ByteNet/pull/16)
+
+### Changes
+
+- Uses a growth factor of 2 over `math.round(1.5)` due to performance
+
+---
+
 ## 0.4.4
 
 ### Fixes
