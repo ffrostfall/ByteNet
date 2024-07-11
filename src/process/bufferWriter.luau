@@ -31,7 +31,7 @@ local function alloc(bytes: number)
 		return
 	end
 
-	size = math.round(size * 1.5)
+	size *= 2
 
 	local newBuffer = bufferCreate(size)
 	bufferCopy(newBuffer, 0, buff)
@@ -41,7 +41,7 @@ end
 
 local function dyn_alloc(bytes: number)
 	while cursor + bytes >= size do
-		size = math.round(size * 1.5)
+		size *= 2
 	end
 
 	local newBuffer = buffer.create(size)
