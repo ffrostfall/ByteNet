@@ -73,6 +73,9 @@ function serverProcess.sendPlayerReliable(
 	writer: (value: any) -> (),
 	data: { [string]: any }
 )
+	if not perPlayerReliable[player] then
+		perPlayerReliable[player] = create()
+	end
 	perPlayerReliable[player] = writePacket(perPlayerReliable[player], id, writer, data)
 end
 
@@ -82,6 +85,9 @@ function serverProcess.sendPlayerUnreliable(
 	writer: (value: any) -> (),
 	data: { [string]: any }
 )
+	if not perPlayerUnreliable[player] then
+		perPlayerUnreliable[player] = create()
+	end
 	perPlayerUnreliable[player] = writePacket(perPlayerUnreliable[player], id, writer, data)
 end
 
