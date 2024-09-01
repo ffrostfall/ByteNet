@@ -35,7 +35,15 @@ return function(incomingBuffer: buffer, references: { [number]: unknown }?, play
 	readRefs.set(references)
 
 	while readCursor < length do
-		local packet = ref[buffer.readu8(incomingBuffer, readCursor)]
+		local packet
+		while true do 
+			packet = ref[buffer.readu8(incomingBuffer, readCursor)]
+			if not packet then
+				task.wait()
+			else
+				break
+			end
+		end
 		readCursor += 1
 
 		local value, valueLength = packet.reader(incomingBuffer, readCursor)

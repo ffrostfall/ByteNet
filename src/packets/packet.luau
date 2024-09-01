@@ -85,25 +85,20 @@ return function(props: types.packetProps<types.dataTypeInterface<any>>, id: numb
 
 	function exported.wait()
 		-- define it up here so we can use it to disconnect
-		local index: number
-
 		local runningThread = coroutine.running()
-		table.insert(listeners, function(data, player)
+		local Callback: (any,Player) -> () 
+		Callback = function(data, player)
 			task.spawn(runningThread, data, player)
-
-			-- Disconnects the listener
-			table.remove(listeners, index)
-		end)
-
-		-- we connected, time to set the index for when we need to disconnect.
-		index = #listeners
-
-		-- the listener will resume the thread
+			table.remove(listeners,table.find(listeners,Callback))
+		end
+		table.insert(listeners, Callback)
 		return coroutine.yield()
 	end
-
 	function exported.listen(callback)
 		table.insert(listeners, callback)
+		return function()
+			table.remove(listeners,table.find(listeners, callback))
+		end
 	end
 
 	function exported.getListeners()
