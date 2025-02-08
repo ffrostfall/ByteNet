@@ -15,6 +15,7 @@ function values.start()
 	if runContext == "server" then
 		local storage = Instance.new("Folder")
 		storage.Name = "BytenetStorage"
+		storage.Archivable = false
 		storage.Parent = ReplicatedStorage
 
 		valueFolder = storage
