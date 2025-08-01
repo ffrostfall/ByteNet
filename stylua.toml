@@ -1,6 +1,9 @@
-column_width = 120
+column_width = 100
 line_endings = "Unix"
 indent_type = "Tabs"
 indent_width = 5
 quote_style = "AutoPreferDouble"
-collapse_simple_statement = "Never"
+call_parentheses = "Input"
+
+[sort_requires]
+enabled = true
