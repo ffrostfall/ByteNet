@@ -1,9 +1,9 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 
-local types = require(script.Parent.Parent.types)
-local read = require(script.Parent.read)
-local bufferWriter = require(script.Parent.bufferWriter)
+local types = require("../types")
+local read = require("./read")
+local bufferWriter = require("./bufferWriter")
 
 local writePacket = bufferWriter.writePacket
 
@@ -12,7 +12,7 @@ local function onClientEvent(receivedBuffer, ref)
 end
 
 -- Shared with: src/process/server.luau (Infeasible to split this into another file)
-local function create()
+local function create(): types.channelData
 	return {
 		cursor = 0,
 		size = 256,

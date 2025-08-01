@@ -1,7 +1,21 @@
 [package]
 name = "ffrostflame/bytenet"
-version = "0.4.6"
+version = "0.5.0"
 registry = "https://github.com/UpliftGames/wally-index"
 realm = "shared"
+exclude = [
+	"dev",
+	".eslintrc",
+	".gitattributes",
+	".gitignore",
+	".prettierrc",
+	"dev.project.json",
+	"package.json",
+	"mkdocs.yml",
+	"stylua.toml",
+	"tsconfig.json",
+	"style.md",
+	"CONTRIBUTING.md",
+]
 
 [dependencies]

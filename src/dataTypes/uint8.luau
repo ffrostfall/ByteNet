@@ -1,5 +1,5 @@
-local types = require(script.Parent.Parent.types)
-local bufferWriter = require(script.Parent.Parent.process.bufferWriter)
+local types = require("../types")
+local bufferWriter = require("../process/bufferWriter")
 
 local writeu8 = bufferWriter.writeu8
 

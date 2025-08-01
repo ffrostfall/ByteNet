@@ -1,4 +1,32 @@
 {
-	"luau-lsp.sourcemap.rojoProjectFile": "dev.project.json",
-	"luau-lsp.completion.imports.requireStyle": "alwaysRelative"
+	"[luau]": {
+		"editor.formatOnSave": true,
+		"editor.defaultFormatter": "JohnnyMorganz.stylua"
+	},
+
+	"stylua.targetReleaseVersion": "latest",
+	
+	"luau-lsp.fflags.enableNewSolver": true,
+	"luau-lsp.completion.imports.stringRequires.enabled": true,
+
+	// tabs over spaces
+	"editor.detectIndentation": false,
+	"editor.insertSpaces": false,
+	"prettier.useTabs": true,
+	"files.eol": "\n",
+	
+	"luau-lsp.sourcemap.enabled": true,
+	"luau-lsp.sourcemap.autogenerate": false,
+	"luau-lsp.sourcemap.sourcemapFile": "sourcemap.json",
+	
+	"luau-lsp.completion.imports.ignoreGlobs": [
+		"**/_Index/**",
+		"**/mirrors/**"
+	],
+	
+	"luau-lsp.ignoreGlobs": [
+		"**/_Index/**",
+		"build/**",
+		"vendor/**"
+	]
 }

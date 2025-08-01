@@ -1,6 +1,6 @@
 --!optimize 2
-local bufferWriter = require(script.Parent.Parent.process.bufferWriter)
-local types = require(script.Parent.Parent.types)
+local bufferWriter = require("../process/bufferWriter")
+local types = require("../types")
 
 local writeu16 = bufferWriter.writeu16
 
@@ -10,7 +10,6 @@ local writeu16 = bufferWriter.writeu16
 return function<T>(valueType: types.dataTypeInterface<T>): types.dataTypeInterface<{ [number]: T }>
 	local valueWrite = valueType.write
 	local valueRead = valueType.read
-	
 
 	return {
 		read = function(b: buffer, cursor: number)

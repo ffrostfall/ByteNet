@@ -3,9 +3,9 @@
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 
-local types = require(script.Parent.Parent.types)
-local client = require(script.Parent.Parent.process.client)
-local server = require(script.Parent.Parent.process.server)
+local types = require("../types")
+local client = require("../process/client")
+local server = require("../process/server")
 
 local moduleRunContext: "server" | "client" = if RunService:IsServer() then "server" else "client"
 

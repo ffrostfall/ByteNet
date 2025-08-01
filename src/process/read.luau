@@ -1,7 +1,7 @@
 --!optimize 2
 --!native
-local packetIDs = require(script.Parent.Parent.namespaces.packetIDs)
-local readRefs = require(script.Parent.readRefs)
+local packetIDs = require("../")
+local readRefs = require("./readRefs")
 
 local ref = packetIDs.ref()
 local freeThread: thread?
@@ -20,12 +20,7 @@ local function yielder()
 end
 
 local function runListener(fn, ...)
-	if freeThread == nil then
-		freeThread = coroutine.create(yielder)
-		coroutine.resume(freeThread :: thread)
-	end
-
-	task.spawn(freeThread :: thread, fn, ...)
+	freeThread = task.spawn(freeThread or task.spawn(coroutine.create(yielder)), fn, ...)
 end
 
 return function(incomingBuffer: buffer, references: { [number]: unknown }?, player: Player?)

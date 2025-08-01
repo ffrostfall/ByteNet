@@ -1,6 +1,6 @@
-local bufferWriter = require(script.Parent.Parent.process.bufferWriter)
+local bufferWriter = require("../process/bufferWriter")
 local readRefs = require(script.Parent.Parent.process.readRefs)
-local types = require(script.Parent.Parent.types)
+local types = require("../types")
 
 local writeReference = bufferWriter.writeReference
 local alloc = bufferWriter.alloc

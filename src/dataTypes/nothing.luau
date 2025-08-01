@@ -1,4 +1,4 @@
-local types = require(script.Parent.Parent.types)
+local types = require("../types")
 
 local nothing = {
 	write = function() end,

@@ -1,5 +1,5 @@
-local bufferWriter = require(script.Parent.Parent.process.bufferWriter)
-local types = require(script.Parent.Parent.types)
+local bufferWriter = require("../process/bufferWriter")
+local types = require("../types")
 
 local writef32NoAlloc = bufferWriter.writef32NoAlloc
 local alloc = bufferWriter.alloc
@@ -12,13 +12,13 @@ local cframe = {
 		local rx = buffer.readf32(b, cursor + 12)
 		local ry = buffer.readf32(b, cursor + 16)
 		local rz = buffer.readf32(b, cursor + 20)
-		
+
 		return CFrame.new(x, y, z) * CFrame.Angles(rx, ry, rz), 24
 	end,
 	write = function(value: CFrame)
 		local x, y, z = value.X, value.Y, value.Z
 		local rx, ry, rz = value:ToEulerAnglesXYZ()
-		
+
 		-- Math done, write it now
 		alloc(24)
 		writef32NoAlloc(x)

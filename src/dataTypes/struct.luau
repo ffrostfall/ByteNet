@@ -2,7 +2,7 @@ local RunService = game:GetService("RunService")
 
 local namespacesDependencies = require(script.Parent.Parent.namespaces.namespacesDependencies)
 local values = require(script.Parent.Parent.replicated.values)
-local types = require(script.Parent.Parent.types)
+local types = require("../types")
 
 local runContext: "server" | "client" = if RunService:IsServer() then "server" else "client"
 

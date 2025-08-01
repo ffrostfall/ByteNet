@@ -15,7 +15,7 @@
 	
 	A lot of these functions just exist as shorthand optimizations.
 ]]
-local types = require(script.Parent.Parent.types)
+local types = require("../types")
 
 local size: number
 local cursor: number
