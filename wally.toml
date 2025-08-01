@@ -1,5 +1,5 @@
 [package]
-name = "ffrostflame/bytenet"
+name = "ffrostfall/bytenet"
 version = "0.5.0"
 registry = "https://github.com/UpliftGames/wally-index"
 realm = "shared"
@@ -17,5 +17,3 @@ exclude = [
 	"style.md",
 	"CONTRIBUTING.md",
 ]
-
-[dependencies]

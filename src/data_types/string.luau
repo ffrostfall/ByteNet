@@ -1,20 +1,14 @@
-local bufferWriter = require("../process/bufferWriter")
 local types = require("../types")
-
-local writeu16 = bufferWriter.writeu16
-local writestring = bufferWriter.writestring
-
-local dyn_alloc = bufferWriter.dyn_alloc
 
 local str = {
 	-- 2 bytes for the length, then the string
 
-	read = function(b: buffer, cursor: number)
+	read = @native function(b: buffer, cursor: number)
 		local length = buffer.readu16(b, cursor)
 
 		return buffer.readstring(b, cursor + 2, length), length + 2
 	end,
-	write = function(data: string)
+	write = @native function(data: string)
 		local length = string.len(data)
 		writeu16(length)
 
@@ -23,6 +17,6 @@ local str = {
 	end,
 }
 
-return function(): types.dataTypeInterface<string>
+return @native function(): types.DataType<string>
 	return str
 end

@@ -1,44 +1,50 @@
 --!optimize 2
 --!native
-local packetIDs = require("../")
+local packetIDs = require("../a")
 local readRefs = require("./readRefs")
 
 local ref = packetIDs.ref()
-local freeThread: thread?
+local free_thread: thread?
 
-local function functionPasser(fn, ...)
-	local aquiredThread = freeThread
-	freeThread = nil
+@native
+local function function_passer(fn, ...)
+	local aquiredThread = free_thread
+	free_thread = nil
 	fn(...)
-	freeThread = aquiredThread
+	free_thread = aquiredThread
 end
 
+@native
 local function yielder()
 	while true do
-		functionPasser(coroutine.yield())
+		function_passer(coroutine.yield())
 	end
 end
 
-local function runListener(fn, ...)
-	freeThread = task.spawn(freeThread or task.spawn(coroutine.create(yielder)), fn, ...)
+@native
+local function run_listener(fn, ...)
+	free_thread = task.spawn(free_thread or task.spawn(coroutine.create(yielder)), fn, ...)
 end
 
-return function(incomingBuffer: buffer, references: { [number]: unknown }?, player: Player?)
-	local length = buffer.len(incomingBuffer)
-	local readCursor = 0
+@native
+local function read(incoming_buff: buffer, references: { [number]: unknown }?, player: Player?)
+	local length = buffer.len(incoming_buff)
+	local read_cursor = 0
 
 	readRefs.set(references)
 
-	while readCursor < length do
-		local packet = ref[buffer.readu8(incomingBuffer, readCursor)]
-		readCursor += 1
+	while read_cursor < length do
+		local packet = ref[buffer.readu8(incoming_buff, read_cursor)]
+		read_cursor += 1
 
-		local value, valueLength = packet.reader(incomingBuffer, readCursor)
+		local value, value_len = packet.reader(incoming_buff, read_cursor)
 
-		readCursor += valueLength
+		read_cursor += value_len
 
 		for _, listener in packet.getListeners() do
-			runListener(listener, value, player)
+			run_listener(listener, value, player)
 		end
 	end
 end
+
+return read

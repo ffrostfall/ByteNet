@@ -1,12 +1,7 @@
-local bufferWriter = require("../process/bufferWriter")
 local types = require("../types")
 
-local writeu16 = bufferWriter.writeu16
-local writecopy = bufferWriter.writecopy
-local dyn_alloc = bufferWriter.dyn_alloc
-
 local buff = {
-	read = function(b: buffer, cursor: number)
+	read = @native function(b: buffer, cursor: number)
 		local length = buffer.readu16(b, cursor)
 		local freshBuffer = buffer.create(length)
 
@@ -15,7 +10,7 @@ local buff = {
 
 		return freshBuffer, length + 2
 	end,
-	write = function(data: buffer)
+	write = @native function(data: buffer)
 		local length = buffer.len(data)
 		writeu16(length)
 
@@ -26,6 +21,6 @@ local buff = {
 	end,
 }
 
-return function(): types.dataTypeInterface<buffer>
+return @native function(): types.DataType<buffer>
 	return buff
 end

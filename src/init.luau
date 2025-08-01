@@ -1,46 +1,40 @@
 local RunService = game:GetService("RunService")
 
-local clientProcess = require(script.process.client)
-local array = require(script.dataTypes.array)
-local bool = require(script.dataTypes.bool)
-local buff = require(script.dataTypes.buff)
-local cframe = require(script.dataTypes.cframe)
-local float32 = require(script.dataTypes.float32)
-local float64 = require(script.dataTypes.float64)
-local inst = require(script.dataTypes.inst)
-local int16 = require(script.dataTypes.int16)
-local int32 = require(script.dataTypes.int32)
-local int8 = require(script.dataTypes.int8)
-local map = require(script.dataTypes.map)
-local nothing = require(script.dataTypes.nothing)
-local optional = require(script.dataTypes.optional)
-local string = require(script.dataTypes.string)
-local struct = require(script.dataTypes.struct)
-local uint16 = require(script.dataTypes.uint16)
-local uint32 = require(script.dataTypes.uint32)
-local uint8 = require(script.dataTypes.uint8)
-local unknown = require(script.dataTypes.unknown)
-local vec2 = require(script.dataTypes.vec2)
-local vec3 = require(script.dataTypes.vec3)
-local namespace = require(script.namespaces.namespace)
-local definePacket = require(script.packets.definePacket)
-local serverProcess = require(script.process.server)
-local values = require(script.replicated.values)
-local types = require(script.types)
-
-values.start()
+local array = require("@self/data_types/array")
+local bool = require("@self/data_types/bool")
+local buff = require("@self/data_types/buff")
+local cframe = require("@self/data_types/cframe")
+local client = require("@self/process/client")
+local define_packet = require("@self/packets/define_packet")
+local float32 = require("@self/data_types/float32")
+local float64 = require("@self/data_types/float64")
+local inst = require("@self/data_types/inst")
+local int16 = require("@self/data_types/int16")
+local int32 = require("@self/data_types/int32")
+local int8 = require("@self/data_types/int8")
+local map = require("@self/data_types/map")
+local nothing = require("@self/data_types/nothing")
+local optional = require("@self/data_types/optional")
+local server = require("@self/process/server")
+local string = require("@self/data_types/string")
+local struct = require("@self/data_types/struct")
+local uint16 = require("@self/data_types/uint16")
+local uint32 = require("@self/data_types/uint32")
+local uint8 = require("@self/data_types/uint8")
+local unknown = require("@self/data_types/unknown")
+local vec2 = require("@self/data_types/vec2")
+local vec3 = require("@self/data_types/vec3")
 
 if RunService:IsServer() then
-	serverProcess.start()
+	server.start()
 else
-	clientProcess.start()
+	client.init()
 end
 
-return (
-	table.freeze({
-		definePacket = definePacket,
-		defineNamespace = namespace,
+return table.freeze({
+	define_packet = define_packet,
 
+	t = {
 		array = array,
 		bool = bool(),
 		optional = optional,
@@ -62,5 +56,5 @@ return (
 		inst = inst(),
 		unknown = unknown(),
 		nothing = nothing(),
-	}) :: any
-) :: types.ByteNet
+	},
+})

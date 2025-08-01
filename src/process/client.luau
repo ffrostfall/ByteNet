@@ -1,18 +1,17 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 
-local types = require("../types")
 local read = require("./read")
-local bufferWriter = require("./bufferWriter")
+local types = require("../types")
 
-local writePacket = bufferWriter.writePacket
-
+@native
 local function onClientEvent(receivedBuffer, ref)
 	read(receivedBuffer, ref)
 end
 
 -- Shared with: src/process/server.luau (Infeasible to split this into another file)
-local function create(): types.channelData
+@native
+local function create(): types.ChannelState
 	return {
 		cursor = 0,
 		size = 256,
@@ -21,30 +20,31 @@ local function create(): types.channelData
 	}
 end
 
-local function dump(channel: types.channelData): (buffer, { unknown }?)
+@native
+local function dump(channel: types.ChannelState): (buffer, { unknown }?)
 	local cursor = channel.cursor
-	local dumpBuffer = buffer.create(cursor)
+	local dump_buffer = buffer.create(cursor)
 
-	buffer.copy(dumpBuffer, 0, channel.buff, 0, cursor)
+	buffer.copy(dump_buffer, 0, channel.buff, 0, cursor)
 
-	return dumpBuffer, if #channel.references > 0 then channel.references else nil
+	return dump_buffer, if #channel.references > 0 then channel.references else nil
 end
 -- No longer shared
 
-local reliable: types.channelData = create()
-local unreliable: types.channelData = create()
+local reliable: types.ChannelState = create()
+local unreliable: types.ChannelState = create()
 
-local clientProcess = {}
+local client = {}
 
-function clientProcess.sendReliable(id: number, writer: (value: any) -> (), data: { [string]: any })
+function client.send_reliable<T>(id: number, data: T)
 	reliable = writePacket(reliable, id, writer, data)
 end
 
-function clientProcess.sendUnreliable(id: number, writer: (value: any) -> (), data: { [string]: any })
+function client.send_unreliable(id: number, writer: (value: any) -> (), data: { [string]: any })
 	unreliable = writePacket(unreliable, id, writer, data)
 end
 
-function clientProcess.start()
+function client.init()
 	local reliableRemote = ReplicatedStorage:WaitForChild("ByteNetReliable")
 	reliableRemote.OnClientEvent:Connect(onClientEvent)
 
@@ -72,4 +72,4 @@ function clientProcess.start()
 	end)
 end
 
-return clientProcess
+return client

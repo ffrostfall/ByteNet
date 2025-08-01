@@ -7,15 +7,15 @@ local types = require("../types")
 local client = require("../process/client")
 local server = require("../process/server")
 
-local moduleRunContext: "server" | "client" = if RunService:IsServer() then "server" else "client"
+local run_context: "server" | "client" = if RunService:IsServer() then "server" else "client"
 
 --[[
 	We use closures here instead of metatables for performance
 	It's just faster to use closures than metatables
 ]]
-return function(props: types.packetProps<types.dataTypeInterface<any>>, id: number)
+return@native function(props: types.PacketProps<types.DataType<any>>, id: number)
 	-- Basic properties: reliability type, "unique" which is used to get the packet ID, and set up listeners
-	local reliabilityType = props.reliabilityType or "reliable"
+	local reliabilityType = props.reliability or "reliable"
 	local listeners = {}
 
 	local serverSendFunction: (player: Player, id: number, writer: (value: any) -> (), data: any) -> () = if reliabilityType
@@ -30,8 +30,8 @@ return function(props: types.packetProps<types.dataTypeInterface<any>>, id: numb
 
 	local clientSendFunction: (id: number, writer: (value: any) -> (), data: any) -> () = if reliabilityType
 			== "reliable"
-		then client.sendReliable
-		else client.sendUnreliable
+		then client.send_reliable
+		else client.send_unreliable
 
 	-- shorcut to avoid indexxing
 	local writer = props.value.write
@@ -40,13 +40,13 @@ return function(props: types.packetProps<types.dataTypeInterface<any>>, id: numb
 
 	-- RunContext error checking that doesn't have performance drawbacks
 	setmetatable(exported, {
-		__index = function(index)
+		__index =@native function(index)
 			if
 				(index == "sendTo" or index == "sendToAllExcept" or index == "sendToAll")
-				and moduleRunContext == "client"
+				and run_context == "client"
 			then
 				error("You cannot use sendTo, sendToAllExcept, or sendToAll on the client")
-			elseif index == "send" and moduleRunContext == "server" then
+			elseif index == "send" and run_context == "server" then
 				error("You cannot use send on the server")
 			end
 		end,
@@ -55,7 +55,7 @@ return function(props: types.packetProps<types.dataTypeInterface<any>>, id: numb
 	-- exposed for the reader file
 	exported.reader = props.value.read
 
-	if moduleRunContext == "server" then
+	if run_context == "server" then
 		function exported.sendToList(data, players: { Player })
 			for _, player in players do
 				serverSendFunction(player, id, writer, data)
@@ -77,7 +77,7 @@ return function(props: types.packetProps<types.dataTypeInterface<any>>, id: numb
 		function exported.sendToAll(data)
 			serverSendAllFunction(id, writer, data)
 		end
-	elseif moduleRunContext == "client" then
+	elseif run_context == "client" then
 		function exported.send(data)
 			clientSendFunction(id, writer, data)
 		end
@@ -88,7 +88,7 @@ return function(props: types.packetProps<types.dataTypeInterface<any>>, id: numb
 		local index: number
 
 		local runningThread = coroutine.running()
-		table.insert(listeners, function(data, player)
+		table.insert(listeners,@native function(data, player)
 			task.spawn(runningThread, data, player)
 
 			-- Disconnects the listener

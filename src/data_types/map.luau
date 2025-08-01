@@ -1,19 +1,16 @@
-local bufferWriter = require("../process/bufferWriter")
 local types = require("../types")
 
-local writeu16 = bufferWriter.writeu16
-
--- thanks jack :p
-return function(
-	keyType: types.dataTypeInterface<any>,
-	valueType: types.dataTypeInterface<any>
-): types.dataTypeInterface<{ [any]: any }>
+@native
+local function map(
+	keyType: types.DataType<any>,
+	valueType: types.DataType<any>
+): types.DataType<{ [any]: any }>
 	-- Cache these functions to avoid the overhead of the index
-	local keyWrite = keyType.write
-	local valueWrite = valueType.write
+	local key_write = keyType.write
+	local value_write = valueType.write
 
 	return {
-		read = function(b: buffer, cursor: number)
+		read = @native function(b: buffer, cursor: number)
 			local map = {}
 			local mapCursor = cursor
 
@@ -35,7 +32,7 @@ return function(
 			-- Return the map, alongside length, because mapCursor - cursor = size
 			return map, mapCursor - cursor
 		end,
-		write = function(map: any)
+		write = @native function(map: any)
 			local count = 0
 			for _ in map do
 				count += 1
@@ -46,9 +43,11 @@ return function(
 
 			for k, v in map do
 				-- Write key/value pairs
-				keyWrite(k)
-				valueWrite(v)
+				key_write(k)
+				value_write(v)
 			end
 		end,
 	}
 end
+
+return map

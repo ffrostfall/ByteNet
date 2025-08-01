@@ -6,11 +6,14 @@
 
 	Packet shouldnt need to care about making its own ID
 ]]
-local types = require("../types")
 local packet = require("./packet")
+local types = require("../types")
 
-return function(props: types.packetProps<any>)
-	return function(id: number)
+@native
+local function define_packet(props: types.PacketProps<any>)
+	return @native function(id: number)
 		return packet(props, id)
 	end
 end
+
+return define_packet

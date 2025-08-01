@@ -1,21 +1,21 @@
 --!native
---!optimize 2
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 
-local types = require("../types")
+local buffer_writer = require("./buffer_writer")
 local read = require("./read")
-local bufferWriter = require("./bufferWriter")
+local types = require("../types")
 
-local writePacket = bufferWriter.writePacket
+local write_packet = buffer_writer.write_packet
 
--- All channelData is set to nil upon being sent which is why these are all optionals
-local perPlayerReliable: { [Player]: types.channelData } = {}
-local perPlayerUnreliable: { [Player]: types.channelData } = {}
+-- All ChannelState is set to nil upon being sent which is why these are all optionals
+local per_player_reliable: { [Player]: types.ChannelState } = {}
+local per_player_unreliable: { [Player]: types.ChannelState } = {}
 
 -- Shared with: src/process/client.luau (Infeasible to split this into another file)
-local function create(): types.channelData
+@native
+local function create(): types.ChannelState
 	return {
 		cursor = 0,
 		size = 256,
@@ -24,21 +24,23 @@ local function create(): types.channelData
 	}
 end
 
-local function dump(channel: types.channelData): (buffer, { unknown }?)
+@native
+local function dump(channel: types.ChannelState): (buffer, { unknown }?)
 	local cursor = channel.cursor
-	local dumpBuffer = buffer.create(cursor)
+	local dump_buff = buffer.create(cursor)
 
-	buffer.copy(dumpBuffer, 0, channel.buff, 0, cursor)
+	buffer.copy(dump_buff, 0, channel.buff, 0, cursor)
 
-	return dumpBuffer, if #channel.references > 0 then channel.references else nil
+	return dump_buff, if #channel.references > 0 then channel.references else nil
 end
 -- No longer shared
 
-local globalReliable: types.channelData = create()
-local globalUnreliable: types.channelData = create()
+local globalReliable: types.ChannelState = create()
+local globalUnreliable: types.ChannelState = create()
 
 -- TODO handle invalid data better
-local function onServerEvent(player: Player, data, references)
+@native
+local function on_server_event(player: Player, data, references)
 	-- Only accept buffer data
 	if not (typeof(data) == "buffer") then
 		return
@@ -47,60 +49,61 @@ local function onServerEvent(player: Player, data, references)
 	read(data, references, player)
 end
 
-local function playerAdded(player)
-	if not perPlayerReliable[player] then
-		perPlayerReliable[player] = create()
+@native
+local function player_added(player)
+	if not per_player_reliable[player] then
+		per_player_reliable[player] = create()
 	end
 
-	if not perPlayerUnreliable[player] then
-		perPlayerUnreliable[player] = create()
+	if not per_player_unreliable[player] then
+		per_player_unreliable[player] = create()
 	end
 end
 
-local serverProcess = {}
+local server = {}
 
-function serverProcess.sendAllReliable(id: number, writer: (value: any) -> (), data: { [string]: any })
-	globalReliable = writePacket(globalReliable, id, writer, data)
+function server.sendAllReliable(id: number, writer: (value: any) -> (), data: { [string]: any })
+	globalReliable = write_packet(globalReliable, id, writer, data)
 end
 
-function serverProcess.sendAllUnreliable(id: number, writer: (value: any) -> (), data: { [string]: any })
-	globalUnreliable = writePacket(globalUnreliable, id, writer, data)
+function server.sendAllUnreliable(id: number, writer: (value: any) -> (), data: { [string]: any })
+	globalUnreliable = write_packet(globalUnreliable, id, writer, data)
 end
 
-function serverProcess.sendPlayerReliable(
+function server.sendPlayerReliable(
 	player: Player,
 	id: number,
 	writer: (value: any) -> (),
 	data: { [string]: any }
 )
-	perPlayerReliable[player] = writePacket(perPlayerReliable[player], id, writer, data)
+	per_player_reliable[player] = write_packet(per_player_reliable[player], id, writer, data)
 end
 
-function serverProcess.sendPlayerUnreliable(
+function server.sendPlayerUnreliable(
 	player: Player,
 	id: number,
 	writer: (value: any) -> (),
 	data: { [string]: any }
 )
-	perPlayerUnreliable[player] = writePacket(perPlayerUnreliable[player], id, writer, data)
+	per_player_unreliable[player] = write_packet(per_player_unreliable[player], id, writer, data)
 end
 
-function serverProcess.start()
+function server.start()
 	local reliableRemote = Instance.new("RemoteEvent")
 	reliableRemote.Name = "ByteNetReliable"
-	reliableRemote.OnServerEvent:Connect(onServerEvent)
+	reliableRemote.OnServerEvent:Connect(on_server_event)
 	reliableRemote.Parent = ReplicatedStorage
 
 	local unreliableRemote = Instance.new("UnreliableRemoteEvent")
 	unreliableRemote.Name = "ByteNetUnreliable"
-	unreliableRemote.OnServerEvent:Connect(onServerEvent)
+	unreliableRemote.OnServerEvent:Connect(on_server_event)
 	unreliableRemote.Parent = ReplicatedStorage
 
 	for _, player in Players:GetPlayers() do
-		playerAdded(player)
+		player_added(player)
 	end
 
-	Players.PlayerAdded:Connect(playerAdded)
+	Players.PlayerAdded:Connect(player_added)
 
 	RunService.Heartbeat:Connect(function()
 		-- Check if the channel has anything before trying to send it
@@ -121,23 +124,23 @@ function serverProcess.start()
 		end
 
 		for _, player in Players:GetPlayers() do
-			if perPlayerReliable[player].cursor > 0 then
-				local b, r = dump(perPlayerReliable[player])
+			if per_player_reliable[player].cursor > 0 then
+				local b, r = dump(per_player_reliable[player])
 				reliableRemote:FireClient(player, b, r)
 
-				perPlayerReliable[player].cursor = 0
-				table.clear(perPlayerReliable[player].references)
+				per_player_reliable[player].cursor = 0
+				table.clear(per_player_reliable[player].references)
 			end
 
-			if perPlayerUnreliable[player].cursor > 0 then
-				local b, r = dump(perPlayerUnreliable[player])
+			if per_player_unreliable[player].cursor > 0 then
+				local b, r = dump(per_player_unreliable[player])
 				unreliableRemote:FireClient(player, b, r)
 
-				perPlayerUnreliable[player].cursor = 0
-				table.clear(perPlayerUnreliable[player].references)
+				per_player_unreliable[player].cursor = 0
+				table.clear(per_player_unreliable[player].references)
 			end
 		end
 	end)
 end
 
-return serverProcess
+return server

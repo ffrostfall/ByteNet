@@ -26,10 +26,10 @@
 	```lua title="packets.luau"
 	local ByteNet = require(path.to.ByteNet)
 
-	return ByteNet.defineNamespace("example", function()
+	return ByteNet.defineNamespace("example",@native function()
 		return {
 			vectorStringMap = ByteNet.definePacket({
-				value = ByteNet.dataTypes.map(ByteNet.dataTypes.vec3(), ByteNet.dataTypes.string())
+				value = ByteNet.data_types.map(ByteNet.data_types.vec3(), ByteNet.data_types.string())
 			})
 		}
 	end)
