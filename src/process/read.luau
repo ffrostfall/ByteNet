@@ -41,8 +41,9 @@ local function read(incoming_buff: buffer, references: { [number]: unknown }?, p
 
 		read_cursor += value_len
 
-		for _, listener in packet.getListeners() do
-			run_listener(listener, value, player)
+		local listeners = packet.getListeners()
+		for i = #listeners, 1, -1 do
+			run_listener(listeners[i], value, player)
 		end
 	end
 end
