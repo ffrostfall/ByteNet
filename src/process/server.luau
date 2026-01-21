@@ -104,6 +104,10 @@ function server.start()
 	end
 
 	Players.PlayerAdded:Connect(player_added)
+	Players.PlayerRemoving:Connect(function(player)
+		per_player_reliable[player] = nil
+		per_player_unreliable[player] = nil
+	end)
 
 	RunService.Heartbeat:Connect(function()
 		-- Check if the channel has anything before trying to send it
